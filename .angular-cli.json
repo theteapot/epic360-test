@@ -19,9 +19,17 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
+		"styles.css",
+		"../node_modules/fullcalendar/dist/fullcalendar.min.css",
+		"../node_modules/fullcalendar-scheduler/dist/scheduler.css"
       ],
-      "scripts": [],
+      "scripts": [
+		"../node_modules/moment/moment.js",
+		"../node_modules/jquery/dist/jquery.js",
+		"../node_modules/jqueryui/jquery-ui.js",
+		"../node_modules/fullcalendar/dist/fullcalendar.js",
+		"../node_modules/fullcalendar-scheduler/dist/scheduler.js"
+	  ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
