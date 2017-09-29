@@ -2,7 +2,30 @@
 
 <div>
 	<h4> Draggables</h4>
-	<div class='draggable' style="width: 50px; height: auto; border-style: solid;">Event</div>
+	<div class='draggable job'>Event</div>
+	<div class='draggable job'>Event</div>
 </div>
 
+<h2>All on one</h2>
 <div id="scheduler"></div>
+<h2>Just jobs and staff</h2>
+<div id="scheduler2"></div>
+<h2>Nested calendars</h2>
+<div>
+	<h4> Draggables</h4>
+	<div class='draggable job' id="j2" name="J2002">J2002</div>
+	<div class='draggable job' id="j3" name="J5005">J5005</div>
+	<div class='draggable job' id="s2" name="S3000">S3000</div>
+	<div class='draggable job' id="s3" name="S4100">S4100</div>
+	<div class='draggable job' id="s4" name="S3030">S3030</div>
+	<div class='draggable job' id="p2" name="P8279">P8279</div>
+</div>
+<div id="scheduler3"></div>
+
+<p-dialog header="Godfather I" [(visible)]="showTaskDialog" modal="modal" width="300" [responsive]="true" [contentStyle]="{'overflow':'visible'}">
+	<p-dropdown [options]="tasks"></p-dropdown>
+	<p-footer>
+		<button type="button" pButton icon="fa-check" (click)="toggleTaskDialog()" label="Yes"></button>
+		<button type="button" pButton icon="fa-close" (click)="toggleTaskDialog()" label="No"></button>
+	</p-footer>
+</p-dialog>

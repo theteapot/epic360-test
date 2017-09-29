@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
 
@@ -9,33 +9,47 @@ declare var $: any;
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
 
 	scheduler: any;
+	altScheduler: any;
+	nestedScheduler: any;
+
 	jsonData = {
 		title: 'my event'
 	};
+	showTaskDialog: boolean = false;
+
+	tasks = [
+		{ label: 'Select task', value: null },
+		{ label: 'P3034', value: 1 },
+		{ label: 'P3036', value: 2 }
+	];
 
 	constructor() {
 
 	}
 
+	toggleTaskDialog() {
+		this.showTaskDialog = !this.showTaskDialog;
+		console.log('toggle task', this.showTaskDialog);
+	}
+
 	ngOnInit() {
 		// Creating draggables
-		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 });
+		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 }).addClass('job');
 
 		// console.log(fullCalendar); // This is a structural console.log, do not remove!
 		this.scheduler = $('#scheduler');
 		this.scheduler.fullCalendar({
 			defaultView: 'timelineMonth',
+			eventResourceEditable: false,
 			editable: true,
 			droppable: true,
 			aspectRatio: 2.5,
 			eventoverlap: false,
 			eventRender: (event, element) => {
-				console.log('sha', sha1(event.title));
 				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
-					console.log('event', event);
 					element.addClass('job-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
 				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
@@ -49,12 +63,13 @@ export class AppComponent implements OnInit {
 			drop: function (date, jsEvent, ui, resourceId) {
 				console.log('drop', date, jsEvent, ui, resourceId);
 			},
-			resourceRender: function (resourceObj, labelTds, bodyTds) {
-				console.log('resource', labelTds, bodyTds);
-			},
-
-			dayRender: function (date, cell) {
-				console.log('day', date, cell);
+			eventAllow: (dropLocation, draggedEvent) => {
+				// Only allow dragging between plants resources, or the same resource
+				console.log(draggedEvent.resourceId, dropLocation.resourceId);
+				if ((dropLocation.resourceId === draggedEvent.resourceId) ||
+					(dropLocation.resourceId.match(/(j\d-e\d-t)/i) && draggedEvent.resourceId.match(/(j\d-e\d-t)/i))) {
+					return true;
+				}
 			},
 			events: [
 				{
@@ -192,6 +207,233 @@ export class AppComponent implements OnInit {
 					]
 				},
 
+			]
+		});
+		this.altScheduler = $('#scheduler2');
+		// console.log(fullCalendar); // This is a structural console.log, do not remove!
+		this.altScheduler.fullCalendar({
+			defaultView: 'timelineMonth',
+			eventResourceEditable: true,
+			editable: true,
+			droppable: true,
+			aspectRatio: 2.5,
+			eventoverlap: false,
+			eventRender: (event, element) => {
+				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
+					element.addClass('job-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
+					element.addClass('employee-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
+					element.addClass('task-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				}
+			},
+			drop: (date, jsEvent, ui, resourceId) => {
+				console.log('drop', date, jsEvent, ui, resourceId);
+				// Prompt user to assign a task
+				this.toggleTaskDialog();
+			},
+			events: [
+				{
+					title: 'J1001',
+					start: '2017-09-01',
+					end: '2017-09-07',
+					resourceId: 'j1',
+				},
+				{
+					title: 'J1002',
+					start: '2017-09-02',
+					end: '2017-09-14',
+					resourceId: 'j2',
+				},
+				{
+					title: 'E2001',
+					start: '2017-09-01',
+					end: '2017-09-02',
+					resourceId: 'j1-e'
+				},
+				{
+					title: 'E2001',
+					start: '2017-09-05',
+					end: '2017-09-05',
+					resourceId: 'j1-e'
+				},
+				{
+					title: 'E2002',
+					start: '2017-09-02',
+					end: '2017-09-08',
+					resourceId: 'j2-e'
+				},
+				{
+					title: 'E2002',
+					start: '2017-09-10',
+					end: '2017-09-14',
+					resourceId: 'j2-e'
+				},
+				{
+					title: 'E2001',
+					start: '2017-09-07',
+					end: '2017-09-10',
+					resourceId: 'j2-e'
+				},
+				{
+					title: 'E2001',
+					start: '2017-09-13',
+					end: '2017-09-14',
+					resourceId: 'j2-e'
+				},
+			],
+			resources: [
+				{
+					id: 'j1',
+					title: 'J1001: Descriptive Title',
+					children: [
+						{
+							id: 'j1-e',
+							title: 'Staff',
+						}
+					]
+				},
+				{
+					id: 'j2',
+					title: 'J1002: Descriptive Title',
+					children: [
+						{
+							id: 'j2-e',
+							title: 'Staff',
+						}
+					]
+				},
+
+			]
+		});
+		this.nestedScheduler = $('#scheduler3');
+		this.nestedScheduler.fullCalendar({
+			defaultView: 'timelineMonth',
+			eventResourceEditable: true,
+			editable: true,
+			droppable: true,
+			aspectRatio: 2.5,
+			eventoverlap: false,
+			eventRender: (event, element) => {
+				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
+					element.addClass('job-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
+					element.addClass('employee-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
+					element.addClass('task-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				}
+			},
+			drop: (date, jsEvent, ui, resourceId) => {
+				console.log('drop', date, jsEvent, ui, resourceId);
+				// Prompt user to assign a task
+				this.toggleTaskDialog();
+			},
+			eventClick: (event, jsEvent, view) => {
+				// Remove all current resources
+				let resourceId = 0;
+				for (let resource of this.nestedScheduler.fullCalendar('getResources')) {
+					if (resource.title !== event.title) {
+						this.nestedScheduler.fullCalendar('removeResource', resource.id);
+					} else {
+						resourceId = resource.id;
+					}
+				}
+				this.nestedScheduler.fullCalendar('addResource', { id: 'e', title: 'E2001', parentId: resourceId });
+				this.nestedScheduler.fullCalendar('refetchEvents');
+			},
+			events: [
+				{
+					title: 'J1001',
+					start: '2017-09-01',
+					end: '2017-09-07',
+					resourceId: 'j1',
+				},
+				{
+					title: 'E2030',
+					start: '2017-09-01',
+					end: '2017-09-07',
+					resourceId: 'e',
+				}
+			],
+			resources: [
+				{
+					id: 'j1',
+					title: 'J1001: Descriptive Title'
+				}
+			]
+		});
+
+	}
+
+	ngAfterViewInit() {
+		$('tr [data-resource-id]').droppable({
+			drop: (event, ui) => {
+				console.log($(event.target).attr('data-resource-id'));
+				const resourceId = $(event.target).attr('data-resource-id');
+				this.nestedScheduler.fullCalendar('addResource', {
+					id: ui.draggable.attr('id'), title: ui.draggable.attr('name'), parentId: resourceId
+				});
+				this.nestedScheduler.fullCalendar('renderEvent', {
+					title: ui.draggable.attr('name'), start: '2017-09-01',
+					resourceId: ui.draggable.attr('id')
+				}, true);
+			}
+		});
+	}
+
+	createNewNestedCalendar() {
+		this.nestedScheduler.fullCalendar({
+			defaultView: 'timelineMonth',
+			eventResourceEditable: true,
+			editable: true,
+			droppable: true,
+			aspectRatio: 2.5,
+			eventoverlap: false,
+			eventRender: (event, element) => {
+				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
+					element.addClass('job-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
+					element.addClass('employee-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
+					element.addClass('task-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				}
+			},
+			drop: (date, jsEvent, ui, resourceId) => {
+				console.log('drop', date, jsEvent, ui, resourceId);
+				// Prompt user to assign a task
+				this.toggleTaskDialog();
+			},
+			eventClick: (event, jsEvent, view) => {
+				console.log(this.nestedScheduler);
+			},
+			events: [
+				{
+					title: 'E2002',
+					start: '2017-09-01',
+					end: '2017-09-07',
+					resourceId: 'j1',
+				}
+			],
+			resources: [
+				{
+					id: 'j1',
+					title: 'J1001: Descriptive Title',
+					children: [
+						{
+							id: 'j1-e',
+							title: 'Staff',
+						}
+					]
+				}
 			]
 		});
 	}
