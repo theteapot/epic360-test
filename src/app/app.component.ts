@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
 
 declare var $: any;
@@ -15,11 +16,13 @@ export class AppComponent implements OnInit {
 		title: 'my event'
 	};
 
-	constructor() { }
+	constructor() {
+
+	}
 
 	ngOnInit() {
 		// Creating draggables
-		$('.draggable').data('event', {title: 'my event'}).draggable({revert: true, revertDuration: 0});
+		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 });
 
 		// console.log(fullCalendar); // This is a structural console.log, do not remove!
 		this.scheduler = $('#scheduler');
@@ -27,18 +30,44 @@ export class AppComponent implements OnInit {
 			defaultView: 'timelineMonth',
 			editable: true,
 			droppable: true,
+			aspectRatio: 2.5,
+			eventoverlap: false,
+			eventRender: (event, element) => {
+				console.log('sha', sha1(event.title));
+				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
+					console.log('event', event);
+					element.addClass('job-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
+					element.addClass('employee-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
+					element.addClass('task-event');
+					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
+				}
+			},
+			drop: function (date, jsEvent, ui, resourceId) {
+				console.log('drop', date, jsEvent, ui, resourceId);
+			},
+			resourceRender: function (resourceObj, labelTds, bodyTds) {
+				console.log('resource', labelTds, bodyTds);
+			},
+
+			dayRender: function (date, cell) {
+				console.log('day', date, cell);
+			},
 			events: [
 				{
 					title: 'J1001',
 					start: '2017-09-01',
 					end: '2017-09-07',
-					resourceId: 'j1'
+					resourceId: 'j1',
 				},
 				{
 					title: 'J1002',
 					start: '2017-09-02',
 					end: '2017-09-14',
-					resourceId: 'j2'
+					resourceId: 'j2',
 				},
 				{
 					title: 'E2001',
@@ -163,17 +192,17 @@ export class AppComponent implements OnInit {
 					]
 				},
 
-			],
-			drop: function (date, jsEvent, ui, resourceId) {
-				console.log('drop', date, jsEvent, ui, resourceId);
-			},
-			resourceRender: function(resourceObj, labelTds, bodyTds) {
-				console.log('resource', resourceObj, labelTds, bodyTds);
-			},
-			dayRender: function( date, cell) {
-				console.log('day', date, cell);
-			}
+			]
 		});
 	}
 
+	hasher(str: string): string {
+		let hash = 0;
+		for (let i = 0; i < str.length; i++) {
+			hash = ((hash << 5) - hash) + str.charCodeAt(i);
+			hash = hash & hash;
+		}
+		console.log(str, '#' + hash.toString(16));
+		return '#' + hash.toString(16).slice(0, 6);
+	}
 }
