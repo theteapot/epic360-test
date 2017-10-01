@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, OnChanges } from '@angular/core';
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
 
@@ -13,7 +13,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 	scheduler: any;
 	altScheduler: any;
-	nestedScheduler: any;
+	@Input() nestedScheduler: any;
 
 	jsonData = {
 		title: 'my event'
@@ -363,6 +363,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 			],
 			resources: [
 				{
+					id: 'new',
+					title: 'Add new job'
+				},
+				{
 					id: 'j1',
 					title: 'J1001: Descriptive Title'
 				}
@@ -372,19 +376,30 @@ export class AppComponent implements OnInit, AfterViewInit {
 	}
 
 	ngAfterViewInit() {
+		console.log('initialising row');
 		$('tr [data-resource-id]').droppable({
 			drop: (event, ui) => {
-				console.log($(event.target).attr('data-resource-id'));
+				// Dropping on row element
 				const resourceId = $(event.target).attr('data-resource-id');
-				this.nestedScheduler.fullCalendar('addResource', {
-					id: ui.draggable.attr('id'), title: ui.draggable.attr('name'), parentId: resourceId
-				});
-				this.nestedScheduler.fullCalendar('renderEvent', {
-					title: ui.draggable.attr('name'), start: '2017-09-01',
-					resourceId: ui.draggable.attr('id')
-				}, true);
+
+				if ( resourceId !== 'new') {
+					console.log('dropping on fg', $(event.target).attr('data-resource-id'));
+					this.nestedScheduler.fullCalendar('addResource', {
+						id: ui.draggable.attr('id'), title: ui.draggable.attr('name'), parentId: resourceId
+					});
+				} else { // Dropping on create new job element
+					this.nestedScheduler.fullCalendar('addResource', {
+						id: ui.draggable.attr('id'), title: ui.draggable.attr('name')
+					});
+				}
+				this.ngAfterViewInit();
 			}
 		});
+	}
+
+	initStaffDroppable() {
+		// initialises a staff event as a droppable for recieving plant objects
+
 	}
 
 	createNewNestedCalendar() {
@@ -411,6 +426,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 				console.log('drop', date, jsEvent, ui, resourceId);
 				// Prompt user to assign a task
 				this.toggleTaskDialog();
+			},
+			eventRecieve: (event) => {
+				console.log(event);
 			},
 			eventClick: (event, jsEvent, view) => {
 				console.log(this.nestedScheduler);
