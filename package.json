@@ -29,7 +29,9 @@
     "jquery": "^3.2.1",
     "jqueryui": "^1.11.1",
     "npm": "^5.4.2",
+    "primeng": "^4.2.1",
     "rxjs": "^5.4.2",
+    "sha1": "^1.1.1",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {

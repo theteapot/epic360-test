@@ -6,3 +6,37 @@
 	border-style: solid;
 	text-align: center
 }
+
+.job-event {
+	line-height: 2rem;
+}
+
+.employee-event {
+	line-height: 1.3rem;
+}
+
+.task-event {
+	line-height: 0.7rem;
+	font-size: 0.7rem;
+}
+
+/* default text color */
+.fc-event:hover {
+	color: black; 
+}
+
+/* give space underneath events for clicking/selecting days */
+.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {
+	padding-bottom: 0; 
+}
+
+/* Removes spacing from resource bar */
+.fc-resource-area .fc-cell-content {
+	padding-top: 2px !important;
+	padding-bottom: 2px !important;
+}
+
+/* Removes spacing below events */
+.fc-time-area .fc-event-container {
+	padding-bottom: 0 !important;
+}
