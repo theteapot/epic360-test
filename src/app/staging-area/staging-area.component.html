@@ -1,0 +1,15 @@
+
+<div>
+	<div class='wrapper'>
+		<ul class='container task' [dragula]='"first-bag"' *ngFor="let task of tasks" [id]="task.id">
+			<button type="button" (click)="enableDrag(task.id)">Enable</button>
+			<button type="button" (click)="disableDrag(task.id)">Disable</button>
+			<h4>{{task.id}}:{{task.desc}}</h4>
+		</ul>
+		<div class='container' [dragula]='"first-bag"' id="equipmentBag">
+			<li *ngFor="let equip of equipment" [id]="equip.id">
+				{{equip.id}}:{{equip.desc}};
+			</li>
+		</div>
+	</div>
+</div>

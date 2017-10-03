@@ -334,18 +334,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 				// Prompt user to assign a task
 				this.toggleTaskDialog();
 			},
-			eventClick: (event, jsEvent, view) => {
-				// Remove all current resources
-				let resourceId = 0;
-				for (let resource of this.nestedScheduler.fullCalendar('getResources')) {
-					if (resource.title !== event.title) {
-						this.nestedScheduler.fullCalendar('removeResource', resource.id);
-					} else {
-						resourceId = resource.id;
-					}
-				}
-				this.nestedScheduler.fullCalendar('addResource', { id: 'e', title: 'E2001', parentId: resourceId });
-				this.nestedScheduler.fullCalendar('refetchEvents');
+			dropAccept: (draggable) => {
+				return (this.schedulerAccept(draggable));
 			},
 			events: [
 				{
@@ -376,22 +366,27 @@ export class AppComponent implements OnInit, AfterViewInit {
 	}
 
 	ngAfterViewInit() {
-		console.log('initialising row');
-		$('tr [data-resource-id]').droppable({
+		console.log('selecting resources', );
+		$('.fc-body .fc-resource-area tr').droppable({
 			drop: (event, ui) => {
 				// Dropping on row element
 				const resourceId = $(event.target).attr('data-resource-id');
+				console.log('event', event, 'ui', $(ui.draggable).attr('id').match(/[j]\d/));
 
-				if ( resourceId !== 'new') {
-					console.log('dropping on fg', $(event.target).attr('data-resource-id'));
+				// If you drag a staff element onto a job element
+				if (ui.draggable.attr('id').match(/[s]\d/) && resourceId.match(/[j]\d/)) {
+					console.log('adding staff to job');
 					this.nestedScheduler.fullCalendar('addResource', {
 						id: ui.draggable.attr('id'), title: ui.draggable.attr('name'), parentId: resourceId
 					});
-				} else { // Dropping on create new job element
+				// If you drag a job element onto the new resource
+				} else if ( resourceId !== 'new' || ui.draggable.attr('id').match(/[j]\d/)) {
+					console.log('craete new resouce job');
 					this.nestedScheduler.fullCalendar('addResource', {
 						id: ui.draggable.attr('id'), title: ui.draggable.attr('name')
 					});
 				}
+				// TODO: After a resource has been dropped, should apply this to just that element (rather than all which is what I'm currently doing)
 				this.ngAfterViewInit();
 			}
 		});
@@ -402,58 +397,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 	}
 
-	createNewNestedCalendar() {
-		this.nestedScheduler.fullCalendar({
-			defaultView: 'timelineMonth',
-			eventResourceEditable: true,
-			editable: true,
-			droppable: true,
-			aspectRatio: 2.5,
-			eventoverlap: false,
-			eventRender: (event, element) => {
-				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
-					element.addClass('job-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
-					element.addClass('employee-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
-					element.addClass('task-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				}
-			},
-			drop: (date, jsEvent, ui, resourceId) => {
-				console.log('drop', date, jsEvent, ui, resourceId);
-				// Prompt user to assign a task
-				this.toggleTaskDialog();
-			},
-			eventRecieve: (event) => {
-				console.log(event);
-			},
-			eventClick: (event, jsEvent, view) => {
-				console.log(this.nestedScheduler);
-			},
-			events: [
-				{
-					title: 'E2002',
-					start: '2017-09-01',
-					end: '2017-09-07',
-					resourceId: 'j1',
-				}
-			],
-			resources: [
-				{
-					id: 'j1',
-					title: 'J1001: Descriptive Title',
-					children: [
-						{
-							id: 'j1-e',
-							title: 'Staff',
-						}
-					]
-				}
-			]
-		});
+	schedulerAccept(element): boolean {
+		// Determines whether an element dragged onto the scheduler will be accepted
+		if (element.attr('id').match(/[t]\d*/)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	hasher(str: string): string {
