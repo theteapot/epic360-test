@@ -41,17 +41,4 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	ngOnInit() { }
 
-	enableDrag(taskId) {
-		console.log(taskId);
-		$(`#${taskId}`).draggable('enable');
-		// Used to revert a finalised task to unfinalised, so plants can be dragged on
-	}
-
-	disableDrag(taskId) {
-		console.log(taskId);
-		$(`#${taskId}`).draggable('disable');
-		// Used to fix a task so it can be dragged onto scheduler
-
-	}
-
 }

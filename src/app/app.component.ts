@@ -39,276 +39,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 		// Creating draggables
 		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 }).addClass('job');
 
-		// console.log(fullCalendar); // This is a structural console.log, do not remove!
-		this.scheduler = $('#scheduler');
-		this.scheduler.fullCalendar({
-			defaultView: 'timelineMonth',
-			eventResourceEditable: false,
-			editable: true,
-			droppable: true,
-			aspectRatio: 2.5,
-			eventoverlap: false,
-			eventRender: (event, element) => {
-				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
-					element.addClass('job-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
-					element.addClass('employee-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
-					element.addClass('task-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				}
-			},
-			drop: function (date, jsEvent, ui, resourceId) {
-				console.log('drop', date, jsEvent, ui, resourceId);
-			},
-			eventAllow: (dropLocation, draggedEvent) => {
-				// Only allow dragging between plants resources, or the same resource
-				console.log(draggedEvent.resourceId, dropLocation.resourceId);
-				if ((dropLocation.resourceId === draggedEvent.resourceId) ||
-					(dropLocation.resourceId.match(/(j\d-e\d-t)/i) && draggedEvent.resourceId.match(/(j\d-e\d-t)/i))) {
-					return true;
-				}
-			},
-			events: [
-				{
-					title: 'J1001',
-					start: '2017-09-01',
-					end: '2017-09-07',
-					resourceId: 'j1',
-				},
-				{
-					title: 'J1002',
-					start: '2017-09-02',
-					end: '2017-09-14',
-					resourceId: 'j2',
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-01',
-					end: '2017-09-02',
-					resourceId: 'j1-e1'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-05',
-					end: '2017-09-05',
-					resourceId: 'j1-e1'
-				},
-				{
-					title: 'E2002',
-					start: '2017-09-02',
-					end: '2017-09-08',
-					resourceId: 'j2-e2'
-				},
-				{
-					title: 'E2002',
-					start: '2017-09-10',
-					end: '2017-09-14',
-					resourceId: 'j2-e2'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-07',
-					end: '2017-09-10',
-					resourceId: 'j2-e1'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-13',
-					end: '2017-09-14',
-					resourceId: 'j2-e1'
-				},
-				{
-					title: 'P3030',
-					start: '2017-09-01',
-					end: '2017-09-02',
-					resourceId: 'j1-e1-t',
-				},
-				{
-					title: 'P3030',
-					start: '2017-09-05',
-					end: '2017-09-06',
-					resourceId: 'j1-e1-t',
-				},
-				{
-					title: 'P3034',
-					start: '2017-09-02',
-					end: '2017-09-08',
-					resourceId: 'j2-e2-t',
-				},
-				{
-					title: 'P4034',
-					start: '2017-09-06',
-					end: '2017-09-08',
-					resourceId: 'j2-e2-t',
-				},
-				{
-					title: 'P4034',
-					start: '2017-09-10',
-					end: '2017-09-14',
-					resourceId: 'j2-e2-t',
-				},
-				{
-					title: 'P1000',
-					start: '2017-09-07',
-					end: '2017-09-10',
-					resourceId: 'j2-e1-t',
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: '2017-09-02T16:00:00',
-					resourceId: '1'
-				},
-			],
-			resources: [
-				{
-					id: 'j1',
-					title: 'J1001: Descriptive Title',
-					children: [
-						{
-							id: 'j1-e1',
-							title: 'E2001: Staff Name',
-							children: [
-								{
-									id: 'j1-e1-t',
-									title: 'Plants'
-								}
-							]
-						}
-					]
-				},
-				{
-					id: 'j2',
-					title: 'J1002: Descriptive Title',
-					children: [
-						{
-							id: 'j2-e2',
-							title: 'E2002: Staff Name',
-							children: [
-								{
-									id: 'j2-e2-t',
-									title: 'Plants'
-								}
-							]
-						},
-						{
-							id: 'j2-e1',
-							title: 'E2001: Staff Name',
-							children: [
-								{
-									id: 'j2-e1-t',
-									title: 'Plants'
-								}
-							]
-						}
-					]
-				},
-
-			]
-		});
-		this.altScheduler = $('#scheduler2');
-		// console.log(fullCalendar); // This is a structural console.log, do not remove!
-		this.altScheduler.fullCalendar({
-			defaultView: 'timelineMonth',
-			eventResourceEditable: true,
-			editable: true,
-			droppable: true,
-			aspectRatio: 2.5,
-			eventoverlap: false,
-			eventRender: (event, element) => {
-				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
-					element.addClass('job-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d)(?!-)/i)) {
-					element.addClass('employee-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(j\d-e\d-t)/i)) {
-					element.addClass('task-event');
-					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				}
-			},
-			drop: (date, jsEvent, ui, resourceId) => {
-				console.log('drop', date, jsEvent, ui, resourceId);
-				// Prompt user to assign a task
-				this.toggleTaskDialog();
-			},
-			events: [
-				{
-					title: 'J1001',
-					start: '2017-09-01',
-					end: '2017-09-07',
-					resourceId: 'j1',
-				},
-				{
-					title: 'J1002',
-					start: '2017-09-02',
-					end: '2017-09-14',
-					resourceId: 'j2',
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-01',
-					end: '2017-09-02',
-					resourceId: 'j1-e'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-05',
-					end: '2017-09-05',
-					resourceId: 'j1-e'
-				},
-				{
-					title: 'E2002',
-					start: '2017-09-02',
-					end: '2017-09-08',
-					resourceId: 'j2-e'
-				},
-				{
-					title: 'E2002',
-					start: '2017-09-10',
-					end: '2017-09-14',
-					resourceId: 'j2-e'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-07',
-					end: '2017-09-10',
-					resourceId: 'j2-e'
-				},
-				{
-					title: 'E2001',
-					start: '2017-09-13',
-					end: '2017-09-14',
-					resourceId: 'j2-e'
-				},
-			],
-			resources: [
-				{
-					id: 'j1',
-					title: 'J1001: Descriptive Title',
-					children: [
-						{
-							id: 'j1-e',
-							title: 'Staff',
-						}
-					]
-				},
-				{
-					id: 'j2',
-					title: 'J1002: Descriptive Title',
-					children: [
-						{
-							id: 'j2-e',
-							title: 'Staff',
-						}
-					]
-				},
-
-			]
-		});
 		this.nestedScheduler = $('#scheduler3');
 		this.nestedScheduler.fullCalendar({
 			defaultView: 'timelineMonth',
@@ -366,24 +96,25 @@ export class AppComponent implements OnInit, AfterViewInit {
 	}
 
 	ngAfterViewInit() {
-		console.log('selecting resources', );
+		// Creating resource area as droppable
 		$('.fc-body .fc-resource-area tr').droppable({
 			drop: (event, ui) => {
 				// Dropping on row element
 				const resourceId = $(event.target).attr('data-resource-id');
-				console.log('event', event, 'ui', $(ui.draggable).attr('id').match(/[j]\d/));
+				const elementId = $(ui.draggable).attr('id');
+				const elementName = $(ui.draggable).attr('name');
 
 				// If you drag a staff element onto a job element
-				if (ui.draggable.attr('id').match(/[s]\d/) && resourceId.match(/[j]\d/)) {
+				if (elementId.match(/[s]\d/) && resourceId.match(/[j]\d/)) {
 					console.log('adding staff to job');
 					this.nestedScheduler.fullCalendar('addResource', {
-						id: ui.draggable.attr('id'), title: ui.draggable.attr('name'), parentId: resourceId
+						id: elementId, title: elementName, parentId: resourceId
 					});
 				// If you drag a job element onto the new resource
-				} else if ( resourceId !== 'new' || ui.draggable.attr('id').match(/[j]\d/)) {
+				} else if ( resourceId === 'new' && elementId.match(/[j]\d/)) {
 					console.log('craete new resouce job');
 					this.nestedScheduler.fullCalendar('addResource', {
-						id: ui.draggable.attr('id'), title: ui.draggable.attr('name')
+						id: elementId, title: elementName
 					});
 				}
 				// TODO: After a resource has been dropped, should apply this to just that element (rather than all which is what I'm currently doing)
