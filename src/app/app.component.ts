@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, OnChanges, AfterViewChecked } from '@angular/core';
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
 
@@ -9,14 +9,16 @@ declare var $: any;
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
 	@Input() nestedScheduler: any;
-
+	scrolled: boolean = false; // Keeps track of whether view has already been scrolled once
 	jsonData = {
 		title: 'my event'
 	};
+
 	showTaskDialog: boolean = false;
+	scrollLeftBefore: number; // Keeps track of the current scroll position before an event
 
 	tasks = [
 		{ label: 'Select task', value: null },
@@ -33,6 +35,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 		console.log('toggle task', this.showTaskDialog);
 	}
 
+	scrollTo(pos?: number) {
+		const scroller = $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller');
+		scroller.scrollLeft(pos ? pos : 600);
+	}
+
 	ngOnInit() {
 		// Creating draggables
 		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 }).addClass('job');
@@ -43,11 +50,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 				center: 'timeline, timelineMonth'
 			},
 			defaultView: 'timeline',
-			defaultDate: '2017-10-04',
 			visibleRange: (currentDate) => {
 				return {
-					start: currentDate.clone().subtract(20, 'days'),
-					end: currentDate.clone().add(20, 'days') // exclusive end, so 3
+					start: currentDate.clone().subtract(10, 'days'),
+					end: currentDate.clone().add(30, 'days')
 				};
 			},
 			slotLabelFormat: [
@@ -56,6 +62,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 			eventResourceEditable: true,
 			editable: true,
 			droppable: true,
+			slotwidth: 100,
 			aspectRatio: 2.5,
 			eventoverlap: false,
 			eventRender: (event, element) => {
@@ -65,14 +72,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 				} else if (event.resourceId.match(/(s\d\d)(?!-)/i)) {
 					element.addClass('employee-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(p\d\d-t)/i)) {
+				} else if (event.resourceId.match(/([p]\d)/i)) {
 					element.addClass('task-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
 				}
 			},
-			drop: (date, jsEvent, ui, resourceId) => {
-				console.log('jsEvent', jsEvent, 'ui', ui, 'resourceId', resourceId);
-				// Prompt user to assign a task
+			resourceRender: (resourceObj, labelTds, bodyTds) => {
+				this.scrolled = false;
+				this.scrollLeftBefore = $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller').scrollLeft();
+				console.log('resourceRender', $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller').scrollLeft());
 			},
 			dropAccept: (draggable) => {
 				return (this.schedulerAccept(draggable));
@@ -109,9 +117,19 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 	}
 
+	ngAfterViewChecked() {
+		if (!this.scrolled && this.scrollLeftBefore) {
+			this.scrollTo(this.scrollLeftBefore);
+			this.scrolled = true;
+		} else if (!this.scrolled) {
+			this.scrollTo();
+			this.scrolled = true;
+		}
+	}
+
 	ngAfterViewInit() {
 		// Creating resource area as droppable
-
+		this.nestedScheduler.fullCalendar('today');
 		// Creating the new job droppable
 		$('.fc-body .fc-resource-area tr[data-resource-id = "new"]').droppable({
 			drop: (event, ui) => {
