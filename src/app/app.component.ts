@@ -43,7 +43,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 				center: 'timeline, timelineMonth'
 			},
 			defaultView: 'timeline',
-			visibleRange: function(currentDate) {
+			defaultDate: '2017-10-04',
+			visibleRange: (currentDate) => {
 				return {
 					start: currentDate.clone().subtract(20, 'days'),
 					end: currentDate.clone().add(20, 'days') // exclusive end, so 3
@@ -52,9 +53,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 			slotLabelFormat: [
 				'DD/MM'
 			],
-			eventAfterAllRender: (view) => {
-				this.nestedScheduler.fullCalendar('today');
-			},
 			eventResourceEditable: true,
 			editable: true,
 			droppable: true,
