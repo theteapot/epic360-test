@@ -1,28 +1,5 @@
-<!--The content below is only a placeholder and can be replaced.-->
 
-<div>
-	<h4> Draggables</h4>
-	<div class='draggable job'>Event</div>
-	<div class='draggable job'>Event</div>
+<div class="row">
+	<app-staging-area class="col-4"></app-staging-area>
+	<div class="col-8" id="scheduler3"></div>
 </div>
-
-
-<h2>Nested calendars</h2>
-<div>
-	<h4> Draggables</h4>
-	<div class='draggable job' id="j2" name="J2002">J2002</div>
-	<div class='draggable job' id="j3" name="J5005">J5005</div>
-	<div class='draggable job' id="s2" name="S3000">S3000</div>
-	<div class='draggable job' id="s3" name="S4100">S4100</div>
-	<div class='draggable job' id="s4" name="S3030">S3030</div>
-</div>
-<app-staging-area></app-staging-area>
-<div id="scheduler3"></div>
-
-<p-dialog header="Godfather I" [(visible)]="showTaskDialog" modal="modal" width="300" [responsive]="true" [contentStyle]="{'overflow':'visible'}">
-	<p-dropdown [options]="tasks"></p-dropdown>
-	<p-footer>
-		<button type="button" pButton icon="fa-check" (click)="toggleTaskDialog()" label="Yes"></button>
-		<button type="button" pButton icon="fa-close" (click)="toggleTaskDialog()" label="No"></button>
-	</p-footer>
-</p-dialog>

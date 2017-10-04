@@ -1,5 +1,75 @@
+/* General elements */
+h4 {
+	padding: 5px;
+}
+
+p {
+	padding: 5px;
+}
+
+.handle {	
+	border-bottom-style: solid;
+	border-color: #DDDDDD;
+	border-width: 1px;
+}
+
+/* Styling the task elements */
 .task {
 	border-style: solid;
-	width: 50%;
-	height: auto;
+	border-width: 1px;
+	min-width: 50%;
+	margin: 5px;
+	border-color: #DDDDDD;	
 }
+
+.task .handle {
+	background: lightgreen;		
+}
+
+/* Styling equipment elements */
+.equipment {
+	border-style: solid;
+	border-width: 1px;
+	border-color: #DDDDDD;
+	margin: 5px;	
+}
+
+.equipment .handle {
+	background: lightgoldenrodyellow;
+	display: inline-block;
+	border-bottom-style: none;
+	border-right-style: solid;
+}
+
+.equipment p {
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+}
+
+/* Styling the job elements */
+.job {
+	border-style: solid;
+	border-width: 1px;
+	min-width: 80%;
+	margin: auto;
+	border-color: #DDDDDD;
+}
+
+.job .handle {
+	background: lightblue;
+}
+
+/* Styling the staff elements */
+.staff {
+	border-style: solid;
+	border-width: 1px;
+	min-width: 80%;
+	margin: auto;
+	border-color: #DDDDDD;	
+}
+
+.staff .handle {
+	background: lightcoral;
+}
+

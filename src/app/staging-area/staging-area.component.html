@@ -1,13 +1,43 @@
+<p-tabView>
 
-<div>
-	<div>
-		<ul class='container task' [dragula]='"first-bag"' *ngFor="let task of tasks" [id]="task.id">
-			<h4>{{task.id}}:{{task.desc}}</h4>
-		</ul>
-		<div class='container task' [dragula]='"first-bag"' id="equipmentBag">
-			<li *ngFor="let equip of equipment" [id]="equip.id">
-				{{equip.id}}:{{equip.desc}};
-			</li>
+	<p-tabPanel header="Jobs">
+		<div class="row wrapper">
+			<div *ngFor="let job of jobs" class="draggable job" [id]="job.id" [attr.name]="job.desc">
+				<h4 class="handle"><b>{{job.id}}</b></h4>
+				<p>{{job.desc}}</p>
+			</div>
 		</div>
-	</div>
-</div>
+	</p-tabPanel>
+
+	<p-tabPanel header="Staff">
+		<div class="row wrapper">
+			<div *ngFor="let s of staff" class="draggable staff" [id]="s.id" [attr.name]="s.desc">
+				<h4 class="handle"><b>{{s.id}}</b></h4>
+				<p>{{s.desc}}</p>
+			</div>
+		</div>
+	</p-tabPanel>
+
+	<p-tabPanel header="Staging">
+		<div class="row">
+			<div class="col-6 wrapper">
+				<div *ngFor="let task of tasks" class="task draggable" [id]="task.id">
+					<h4 class="handle">
+						<b>{{task.desc}}</b>
+					</h4>
+					<div class='container' [dragula]='"first-bag"' style="min-height: 50px; padding-bottom: 20px;">
+					</div>
+				</div>
+			</div>
+			<div class="col-6 wrapper">
+				<div class="draggable" [dragula]='"first-bag"' id="equipmentBag">
+					<div *ngFor="let equip of equipment" class="equipment">
+						<div class="handle"><b>{{equip.name}}</b></div>
+						<p>{{equip.desc}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</p-tabPanel>
+</p-tabView>
+

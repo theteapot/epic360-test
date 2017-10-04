@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { DialogModule, ButtonModule, DropdownModule } from 'primeng/primeng';
 import { StagingAreaComponent } from './staging-area/staging-area.component';
 import { DragulaModule } from 'ng2-dragula/ng2-dragula';
+import { TabViewModule, DataListModule } from 'primeng/primeng';
 
 @NgModule({
 	declarations: [
@@ -12,6 +13,8 @@ import { DragulaModule } from 'ng2-dragula/ng2-dragula';
 		StagingAreaComponent,
 	],
 	imports: [
+		DataListModule,
+		TabViewModule,
 		BrowserModule,
 		DragulaModule,
 		DialogModule,
