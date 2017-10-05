@@ -279,6 +279,8 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			// We have created a job resource by dragging
 			// This indicates the job has moved from inactive to active
 			this.jobService.changeStatus(event.id, 'active');
+		} else if (event.type === 'staff') {
+			this.staffService.assignStaff()
 		}
 	}
 
