@@ -1,4 +1,13 @@
 import { Component, OnInit, AfterViewInit, Input, OnChanges, AfterViewChecked } from '@angular/core';
+import { StaffService } from './model/services/staff.service';
+import { TaskService } from './model/services/task.service';
+import { EquipmentService } from './model/services/equipment.service';
+import { JobService } from './model/services/job.service';
+import { Staff } from './model/interfaces/staff.interface';
+import { Task } from './model/interfaces/task.interface';
+import { Equipment } from './model/interfaces/equipment.interface';
+import { Job } from './model/interfaces/job.interface';
+
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
 
@@ -26,24 +35,22 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		{ label: 'P3036', value: 2 }
 	];
 
-	constructor() {
+	events = [
+		{
+		}
+	];
 
-	}
+	resources = [
+		{
+			id: 'new',
+			name: 'Add new job'
+		},
+	];
 
-	toggleTaskDialog() {
-		this.showTaskDialog = !this.showTaskDialog;
-		console.log('toggle task', this.showTaskDialog);
-	}
+	constructor(private staffService: StaffService, private jobService: JobService,
+		private equipmentService: EquipmentService, private taskService: TaskService) { }
 
-	scrollTo(pos?: number) {
-		const scroller = $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller');
-		scroller.scrollLeft(pos ? pos : 600);
-	}
-
-	ngOnInit() {
-		// Creating draggables
-		$('.draggable').data('event', { title: 'my event' }).draggable({ revert: true, revertDuration: 0 }).addClass('job');
-
+	createScheduler(): any {
 		this.nestedScheduler = $('#scheduler3');
 		this.nestedScheduler.fullCalendar({
 			header: {
@@ -65,56 +72,49 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			slotwidth: 100,
 			aspectRatio: 2.5,
 			eventoverlap: false,
+			drop: (date, jsEvent, ui, resourceId) => {
+				console.log('drop', date, jsEvent, ui, resourceId);
+			},
 			eventRender: (event, element) => {
-				if (event.resourceId.match(/([j][\d])(?!-)/i)) {
+				console.log('event render', event);
+				if (event.type === 'job') {
 					element.addClass('job-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/(s\d\d)(?!-)/i)) {
+				} else if (event.type === 'staff') {
 					element.addClass('employee-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
-				} else if (event.resourceId.match(/([p]\d)/i)) {
+				} else if (event.type === 'task') {
 					element.addClass('task-event');
+				} else {
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
 				}
-			},
-			resourceRender: (resourceObj, labelTds, bodyTds) => {
-				this.scrolled = false;
-				this.scrollLeftBefore = $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller').scrollLeft();
-				console.log('resourceRender', $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller').scrollLeft());
 			},
 			dropAccept: (draggable) => {
 				return (this.schedulerAccept(draggable));
 			},
 			eventReceive: (event) => {
-				this.renderMultipleEvents(event);
-				console.log('eventRecieve', event);
+				this.eventReceive(event);
 			},
-			events: [
-				{
-					title: 'J1001',
-					start: '2017-09-01',
-					end: '2017-09-07',
-					resourceId: 'j1',
-				},
-				{
-					title: 'E2030',
-					start: '2017-09-01',
-					end: '2017-09-07',
-					resourceId: 'e',
-				}
-			],
-			resources: [
-				{
-					id: 'new',
-					title: 'Add new job'
-				},
-				{
-					id: 'j1',
-					title: 'J1001: Descriptive Title'
-				}
-			]
+			eventResize: (event, delta, revertFunc, ui, view) => {
+				this.eventResize(event, delta, revertFunc, ui, view);
+			},
+			eventDrop: (event, delta, revertFunc, ui, view) => {
+				this.eventDrop(event, delta, revertFunc, ui, view);
+			},
+			resourceText: (resource) => {
+				return this.getResourceText(resource);
+			},
+			resourceRender: (res, label, body) => {
+				$(label.prevObject).attr('type', 'job');
+				console.log('resource render', body.prevObject, label);
+			},
+			events: this.events,
+			resources: this.resources
 		});
+	}
 
+	ngOnInit() {
+		this.createScheduler();
 	}
 
 	ngAfterViewChecked() {
@@ -127,47 +127,69 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		}
 	}
 
+	scrollTo(pos?: number) {
+		const scroller = $('.fc-body .fc-time-area .fc-scroller-clip .fc-scroller');
+		scroller.scrollLeft(pos ? pos : 600);
+	}
+
 	ngAfterViewInit() {
-		// Creating resource area as droppable
-		this.nestedScheduler.fullCalendar('today');
 		// Creating the new job droppable
 		$('.fc-body .fc-resource-area tr[data-resource-id = "new"]').droppable({
 			drop: (event, ui) => {
 				const resourceId = $(event.target).attr('data-resource-id');
 				const elementId = $(ui.draggable).attr('id');
-				const elementName = $(ui.draggable).attr('name');
+				const elementName = $(ui.draggable).attr('title');
+				const elementType = $(ui.draggable).attr('type');
 
-				if (resourceId === 'new' && elementId.match(/[j]\d/)) {
+				const jobResource = {
+					id: elementId,
+					title: elementName,
+					type: elementType
+				};
+				const jobEvent = {
+					id: elementId,
+					title: elementName,
+					resourceId: elementId,
+					start: new Date().toString(),
+					end: new Date().setDate(new Date().getDate() + 1).toString(),
+					allDay: true,
+					type: elementType,
+				};
+
+				const duplicate = this.nestedScheduler.fullCalendar('getResources').filter(res => res.id === elementId).length > 0;
+
+				if (resourceId === 'new' && elementType === 'job' && !duplicate) {
 					console.log('craete new resouce job');
-					this.nestedScheduler.fullCalendar('addResource', {
-						id: elementId, title: elementName
-					});
-					this.nestedScheduler.fullCalendar('renderEvent', {
-						id: elementId, title: elementName, resourceId: elementId, start: Date().toString()
-					}, true);
+					this.nestedScheduler.fullCalendar('addResource', jobResource, false);
+					this.nestedScheduler.fullCalendar('renderEvent', jobEvent, true);
 				}
+				this.updateResources(jobResource);
+				this.updateEvent(jobEvent);
 				this.ngAfterViewInit();
 			},
 			accept: '.job',
 			hoverClass: 'highlight'
 		});
 
-		// Creating the job resource droppables
+		// Creating the job resource droppables for dropping staff onto jobs
 		$('.fc-body .fc-resource-area tr[data-resource-id != "new"]').droppable({
 			drop: (event, ui) => {
-				console.log('drop', event, ui);
 				// Dropping on row element
+				console.log($(event.target));
 				const resourceId = $(event.target).attr('data-resource-id');
+				const resourceType = $(event.target).attr('type');
 				const elementId = $(ui.draggable).attr('id');
+				const elementType = $(ui.draggable).attr('type');
 				const elementName = $(ui.draggable).attr('name');
-				console.log(resourceId, elementId, elementName);
+
+				console.log(resourceId, elementType, elementName, elementType, resourceType);
 				// If you drag a staff element onto a job element
-				if (elementId.match(/[s]\d/) && resourceId.match(/[j]\d/)) {
-					console.log('adding staff to job');
-					this.nestedScheduler.fullCalendar('addResource', {
-						id: elementId, title: elementName, parentId: resourceId
-					});
-					// If you drag a job element onto the new resource
+				if (elementType === 'staff' && resourceType === 'job') {
+					const resource = {
+						id: `${resourceId}-${elementId}`, type: elementType, name: elementName, parentId: resourceId
+					};
+					this.nestedScheduler.fullCalendar('addResource', resource);
+					this.updateResources(resource);
 				}
 				// TODO: After a resource has been dropped, should apply this to just that element (rather than all which is what I'm currently doing)
 				this.ngAfterViewInit();
@@ -177,18 +199,50 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		});
 	}
 
-	initStaffDroppable() {
-		// initialises a staff event as a droppable for recieving plant objects
-
-	}
-
 	schedulerAccept(element): boolean {
 		// Determines whether an element dragged onto the scheduler will be accepted
-		if (element.attr('id').match(/[t]\d*/)) {
+		console.log('scheudler accept', element);
+		if ($(element).attr('type') === 'task') {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	eventResize(event, delta, revertFunc, ui, view) {
+		// Updates DB when an event is resized, both for tasks and jobs
+		console.log('event resize', event, delta);
+	}
+
+	eventDrop(event, delta, revertFunc, ui, view) {
+		// Updates DB when an event is moved (within the same resource or between)
+		console.log('event drop', event, delta);
+	}
+
+	updateResources(resource) {
+		// Updates DB when a resource is added or removed
+		if (resource.type === 'job') {
+			console.log('create job', resource);
+		} else if (resource.type === 'staff') {
+			console.log('assign staff to job', resource);
+		}
+	}
+
+	eventReceive(event) {
+		// Handle the dropping of external events onto the calendar
+		// Remove the event that the calendar initially creates
+		const eventId = event._id;
+		this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
+			if (filterEvent._id === eventId) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+		// Add in our own events
+		this.renderMultipleEvents(event);
+		this.createEvent(event);
+		// Update the DB
 	}
 
 	renderMultipleEvents(parent) {
@@ -199,14 +253,42 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		// 		start: event.start = parent.start
 
 		// Get title array
-		const eventTitles = parent.equipment.slice(1);
-		console.log(eventTitles);
-		for (const title of eventTitles) {
-			this.nestedScheduler.fullCalendar('renderEvent', {
-				title: title,
+		const eventEquipment = parent.equipment;
+
+		for (const equip of eventEquipment) {
+			const event = {
+				title: `${equip} : ${parent.title}`,
 				start: parent.start,
 				resourceId: parent.resourceId
-			});
+			};
+			this.nestedScheduler.fullCalendar('renderEvent', event);
+			this.createEvent(event); // Update the DB
+			// this.events.push(event);
+		}
+	}
+
+	createEvent(event) {
+		// Given an event object, add it to the events array, creating multiple entries if required
+		console.log('create event', event);
+		this.events.push(event);
+	}
+
+	updateEvent(event) {
+		// Given an event object, update the corresponding DB table with its information
+		if (event.type === 'job') {
+			// We have created a job resource by dragging
+			// This indicates the job has moved from inactive to active
+			this.jobService.changeStatus(event.id, 'active');
+		}
+	}
+
+	getResourceText(resource): string {
+		// Gets the appropriate resource text
+		console.log('resourceText', resource);
+		if (resource.type === 'job') {
+			return resource.title;
+		} else if (resource.type === 'staff') {
+			return resource.name;
 		}
 	}
 
@@ -216,7 +298,6 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			hash = ((hash << 5) - hash) + str.charCodeAt(i);
 			hash = hash & hash;
 		}
-		console.log(str, '#' + hash.toString(16));
 		return '#' + hash.toString(16).slice(0, 6);
 	}
 }
