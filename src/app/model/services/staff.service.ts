@@ -24,4 +24,8 @@ export class StaffService {
 			});
 	}
 
+	assignStaff(jobId: number, staffId: number) {
+		
+	}
+
 }

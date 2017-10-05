@@ -280,7 +280,6 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			// This indicates the job has moved from inactive to active
 			this.jobService.changeStatus(event.id, 'active');
 		} else if (event.type === 'staff') {
-			this.staffService.assignStaff()
 		}
 	}
 
