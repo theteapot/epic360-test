@@ -98,6 +98,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 		dragulaService.drop.subscribe((value) => {
 			let currData = $(value[2]).parents('.draggable').data('event');
+			console.log('fix1', $(value[2]).parents('.draggable'), $(value[1]));
 			const taskTitle = $(value[2]).parents('.draggable').find('h4').text().trim();
 			if (!currData) {
 				currData = {
@@ -141,6 +142,26 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 		// Small timeout to give angular time to render the view before we use it
 		// N.B. there is probably be a better way to do this
 		setTimeout(() => {
+			// Set the properties (if they are not set already)
+			const draggables = $(selector);
+			for (let i = 0; i < draggables.length; i++) {
+
+				var drag = draggables[i];
+				const event = {
+					title: $(drag).find('h4').text().trim() + ': ' + $(drag).find('.equipment .handle').text().trim(),
+					equipment: [],
+					equipmentId: $(drag).find('.equipment').attr('equipmentId'),
+					taskId: $(drag).find('.container').attr('taskId')
+				};
+				console.log('drag event', event)
+				$(drag).data('event', event);
+			} 	/* {
+					title:
+					taskId:
+					equipmentId:
+				}*/
+
+			// Initialise the dragging
 			$(selector).draggable({
 				revert: true,
 				revertDuration: 1,
@@ -179,7 +200,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			workType: this.newTaskForm.value.workType
 		};
 
-		this.taskService.createTask(task).then( (res) => {
+		this.taskService.createTask(task).then((res) => {
 			this.tasks.push(task);
 		});
 	}

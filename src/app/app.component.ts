@@ -126,11 +126,11 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			eventResourceEditable: true,
 			editable: true,
 			droppable: true,
+			drop: (date, jsevent, ui, resourecId) => {
+				console.log('drop', date, jsevent, ui, resourecId, this);
+			},
 			slotwidth: 100,
 			eventoverlap: false,
-			drop: (date, jsEvent, ui, resourceId) => {
-				console.log('drop', date, jsEvent, ui, resourceId);
-			},
 			eventRender: (event, element) => {
 				console.log('event render', event);
 				if (event.type === 'job') {
@@ -252,6 +252,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		// Determines whether an element dragged onto the scheduler will be accepted
 		console.log('scheudler accept', element);
 		if ($(element).attr('type') === 'task') {
+			console.log('accepted');
 			return true;
 		} else {
 			return false;
@@ -301,14 +302,14 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		// Handle the dropping of external events onto the calendar
 		// Remove the event that the calendar initially creates
 		console.log('event recieve', event);
-		const eventId = event._id;
+		/*const eventId = event._id;
 		this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
 			if (filterEvent._id === eventId) {
 				return true;
 			} else {
 				return false;
 			}
-		});
+		});*/
 		// Add in our own events
 		this.renderMultipleEvents(event);
 		// this.createEvent(event);
@@ -317,7 +318,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		const staffId = event.resourceId.split('-')[1];
 		const start = event.start.format('YYYY-MM-DD hh:mm:ss');
 		const end = event.end ? event.end.format('YYYY-MM-DD hh:mm:ss') : event.start.add(1, 'hours').format('YYYY-MM-DD hh:mm:ss');
-		console.log('start', start, 'end', end);
+		console.log('event recieve', start, end);
 		this.taskService.updateTask(taskId, { staffId: staffId, start: start, end: end });
 	}
 
@@ -330,7 +331,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
 		// Get title array
 		const eventEquipment = parent.equipment;
-
+		console.log('render events', parent)
 		for (const equip of eventEquipment) {
 			const event = {
 				title: `${equip} : ${parent.title}`,
