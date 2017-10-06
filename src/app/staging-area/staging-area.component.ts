@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { DragulaService } from 'ng2-dragula/ng2-dragula';
 import { StaffService } from '../model/services/staff.service';
 import { TaskService } from '../model/services/task.service';
@@ -8,6 +9,7 @@ import { Staff } from '../model/interfaces/staff.interface';
 import { Task } from '../model/interfaces/task.interface';
 import { Equipment } from '../model/interfaces/equipment.interface';
 import { Job } from '../model/interfaces/job.interface';
+
 
 declare var $: any;
 
@@ -19,6 +21,7 @@ declare var $: any;
 export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	tasks: Task[];
+	filteredTasks: Task[];
 
 	equipment: Equipment[];
 
@@ -26,10 +29,56 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	staff: Staff[];
 
+	selectedJob: any;
+
+	selectedTaskPanel: string; // Keeps track of whether we are in the assigning or creating task page.
+	taskPanelOptions: any[];
+
+	newTaskForm: FormGroup;
+	workTypes: any[]; // Work types for dropdown menu
+
 	constructor(private dragulaService: DragulaService, private staffService: StaffService,
 		private jobService: JobService, private equipmentService: EquipmentService,
-		private taskService: TaskService) {
+		private taskService: TaskService, private formBuilder: FormBuilder) {
+
+		this.taskPanelOptions = [
+			{ label: 'Assign', value: 'assign' },
+			{ label: 'Create', value: 'create' }
+		];
+
+		this.workTypes = [
+			{ label: 'Type 0', value: 0 },
+			{ label: 'Type 1', value: 1 }
+		];
+
+		this.newTaskForm = formBuilder.group({
+			header: ['', Validators.required],
+			description: ['', Validators.required],
+			workType: ['', Validators.required],
+		});
+
 		this.initialiseDragula(dragulaService);
+	}
+
+	ngOnInit() {
+		this.staffService.getStaff().then(staff => {
+			this.staff = staff;
+			console.log('got staff', staff);
+			this.initDraggables('.draggable.staff');
+		});
+		this.jobService.getJobs().then(jobs => {
+			console.log('got jobs', jobs);
+			this.jobs = jobs;
+			this.initDraggables('.draggable.job');
+		});
+		this.equipmentService.getEquipment().then(equipment => {
+			this.equipment = equipment;
+			this.initDraggables('.draggable.equipment');
+		});
+		this.taskService.getTasks().then(tasks => {
+			this.tasks = tasks;
+			this.initDraggables('.draggable.task');
+		});
 	}
 
 	initialiseDragula(dragulaService: DragulaService) {
@@ -53,14 +102,26 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			if (!currData) {
 				currData = {
 					title: taskTitle,
-					equipment: []
+					equipment: [],
+					taskId: $(value[2]).attr('taskId'),
+					equipmentId: $(value[1]).attr('equipmentId')
 				};
 			}
-			currData.equipment.push($(value[1]).find('.handle').text());
-			// Extend the currData with the new plant name
+			currData.equipment = [($(value[1]).find('.handle').text())];
 			$(value[2]).parents('.draggable').data('event', currData);
-			console.log($(value[2]).parents('.draggable').data('event'));
+
+			// Post to the DB
+			const equipmentId = $(value[1]).attr('equipmentId');
+			const taskId = $(value[2]).attr('taskId');
+			this.taskService.assignEquipment(taskId, equipmentId);
 		});
+
+		dragulaService.remove.subscribe((value) => {
+			// Post to the DB
+			const taskId = $(value[2]).attr('taskId');
+			this.taskService.unassignEquipment(taskId);
+		});
+
 	}
 
 	ngAfterViewInit() {
@@ -79,7 +140,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 	initDraggables(selector: string) {
 		// Small timeout to give angular time to render the view before we use it
 		// N.B. there is probably be a better way to do this
-		setTimeout( () => {
+		setTimeout(() => {
 			$(selector).draggable({
 				revert: true,
 				revertDuration: 1,
@@ -92,24 +153,36 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 		}, 0.5);
 	}
 
-	ngOnInit() {
-		this.staffService.getStaff().then(staff => {
-			this.staff = staff;
-			console.log('got staff', staff);
-			this.initDraggables('.draggable.staff');
+	taskPanelChange() {
+		// Makes it so that when we navigate back from the create panel we will reinit the task panel
+		// so new changes are reflected
+		if (this.selectedTaskPanel === 'assign') {
+			console.log('at panel assign');
+			this.filterTasks();
+		}
+	}
+
+	filterTasks() {
+		// Filters the tasks
+		this.filteredTasks = this.tasks.filter(task => {
+			return task.jobId === this.selectedJob;
 		});
-		this.jobService.getJobs().then(jobs => {
-			this.jobs = jobs;
-			this.initDraggables('.draggable.job');
-		});
-		this.equipmentService.getEquipment().then(equipment => {
-			this.equipment = equipment;
-			this.initDraggables('.draggable.equipment');
-		});
-		this.taskService.getTasks().then(tasks => {
-			this.tasks = tasks;
-			this.initDraggables('.draggable.task');
+		console.log('task filter', this.filteredTasks);
+		this.initDraggables('.draggable.task');
+	}
+
+	createTask() {
+		const task = {
+			jobId: this.selectedJob,
+			header: this.newTaskForm.value.header,
+			description: this.newTaskForm.value.description,
+			workType: this.newTaskForm.value.workType
+		};
+
+		this.taskService.createTask(task).then( (res) => {
+			this.tasks.push(task);
 		});
 	}
+
 
 }

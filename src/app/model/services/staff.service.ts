@@ -25,7 +25,17 @@ export class StaffService {
 	}
 
 	assignStaff(jobId: number, staffId: number) {
-		
+		return this.datasource.postData('create/StaffJobJoin', {jobId: jobId, staffId: staffId})
+			.then( res => {
+				console.log('job and staff');
+			});
 	}
 
+	getStaffAssignment(): Promise<any> {
+		// For getting the jobs staff members are assigned to
+		return this.datasource.getData('read/StaffView')
+			.then( res => {
+				return res;
+			});
+	}
 }

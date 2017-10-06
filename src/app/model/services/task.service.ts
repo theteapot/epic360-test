@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Task } from '../interfaces/task.interface';
+import { MySQLResponse } from '../interfaces/mysql-response.interface';
 import { EpicDbDatasource } from '../datasources/epic-db.datasource';
 import 'rxjs/add/operator/toPromise';
 import * as moment from 'moment';
@@ -10,11 +11,11 @@ export class TaskService {
 
 	task: Task[];
 
-	constructor(private datasource: EpicDbDatasource) {	}
+	constructor(private datasource: EpicDbDatasource) { }
 
 	getTasks(): Promise<Task[]> {
 		return this.datasource.getData('read/TaskView')
-			.then( res => {
+			.then(res => {
 				const data: Task[] = [];
 				res.forEach(element => {
 					element.value = element.taskId;
@@ -28,7 +29,7 @@ export class TaskService {
 			});
 	}
 
-	createTask(task: Task) {
+	createTask(task: Task): Promise<MySQLResponse> {
 		return this.datasource.postData('create/Task', task);
 	}
 
@@ -37,8 +38,8 @@ export class TaskService {
 		return this.datasource.postData(`create/many/Task/${jobId}`, tasks);
 	}
 
-	updateTask(task: Task) {
-		return this.datasource.putData('update/Task', task);
+	updateTask(taskId: number, updates: any): Promise<MySQLResponse> {
+		return this.datasource.putData(`update/Task/taskId/${taskId}`, updates);
 	}
 
 	deleteTask(task: Task) {
@@ -47,7 +48,7 @@ export class TaskService {
 
 	getTaskTemplates(): Promise<Task[]> {
 		return this.datasource.getData('read/TaskTemplate')
-			.then( res => {
+			.then(res => {
 				const data: Task[] = [];
 				res.forEach(element => {
 					element.value = element.taskId;
@@ -56,6 +57,27 @@ export class TaskService {
 				});
 				console.log('tasks', data);
 				return data;
+			});
+	}
+
+	assignEquipment(taskId: number, equipmentId: number) {
+		return this.datasource.putData(`update/Task/taskId/${taskId}`, { equipmentId: equipmentId })
+			.then(res => {
+				console.log(res);
+			});
+	}
+
+	unassignEquipment(taskId: number) {
+		return this.datasource.putData(`update/Task/taskId/${taskId}`, { equipmentId: null })
+			.then(res => {
+				console.log(res);
+			});
+	}
+
+	assignStaff(taskId: number, staffId: number) {
+		return this.datasource.putData(`update/Task/taskId/${taskId}`, { staffId: staffId })
+			.then(res => {
+				console.log(res);
 			});
 	}
 

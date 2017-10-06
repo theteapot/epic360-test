@@ -19,18 +19,28 @@
 	</p-tabPanel>
 
 	<p-tabPanel header="Staging">
-		<div class="row">
+		<p-dropdown [options]="jobs" [(ngModel)]="selectedJob" (onChange)="filterTasks($event)" placeholder="Select Job"></p-dropdown>
+		<p-selectButton [options]="taskPanelOptions" [(ngModel)]="selectedTaskPanel" (click)="taskPanelChange()"></p-selectButton>
+		<div class="row" *ngIf="selectedTaskPanel==='assign'">
 			<div class="col-6 wrapper">
-				<div *ngFor="let task of tasks" class="task draggable" [id]="task.id" [attr.type]="'task'">
+				<div *ngFor="let task of filteredTasks" class="task draggable" [attr.type]="'task'">
 					<h4 class="handle"><b>{{task.header}}</b></h4>
 					<p>{{task.description}}</p>
-					<div class='container' [dragula]='"first-bag"' style="min-height: 50px; padding-bottom: 20px;">
+					<div class='container' [dragula]='"first-bag"' style="min-height: 50px; padding-bottom: 20px;" [attr.taskId]="task.taskId" >
+						<div *ngFor="let equip of equipment"> 
+							<div class="equipment" [attr.equipmentId]="equip.equipmentId" *ngIf="task.equipmentId === equip.equipmentId">
+								<div class="handle"><b>{{equip.registration}}</b></div>
+								<p>{{equip.equipmentType}}</p>
+								<p *ngIf="equip.hours">Hrs: {{equip.hours}}</p>
+								<p *ngIf="equip.kilometers">Kms: {{equip.kilometers}}</p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="col-6 wrapper">
 				<div class="draggable" [dragula]='"first-bag"' id="equipmentBag" [attr.type]="'plant'">
-					<div *ngFor="let equip of equipment" class="equipment">
+					<div *ngFor="let equip of equipment" class="equipment" [attr.equipmentId]="equip.equipmentId">
 						<div class="handle"><b>{{equip.registration}}</b></div>
 						<p>{{equip.equipmentType}}</p>
 						<p *ngIf="equip.hours">Hrs: {{equip.hours}}</p>
@@ -38,6 +48,25 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="row ui-grid ui-grid-responsive ui-fluid" *ngIf="selectedTaskPanel==='create'">
+			<form [formGroup]="newTaskForm">
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-4"><label>Title</label></div>
+					<input type="text" class="ui-grid-col-8" pInputText formControlName="header"/>
+				</div>
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-4"><label>Description</label></div>
+					<textarea pInputTextarea class="ui-grid-col-8" formControlName="description" autoResize="autoResize" [rows]="10" [cols]="30"></textarea>
+				</div>
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-4"><label>Work Type</label></div>
+					<p-dropdown [options]="workTypes" class="ui-grid-col-8" formControlName="workType" placeholder="Work Type"></p-dropdown>						
+				</div>
+				<div class="ui-helper-clearfix">
+					<button type="button" pButton icon="fa-check" (click)="createTask()" label="Create" [disabled]="!(newTaskForm.valid && selectedJob)"></button>
+				</div>
+			</form>			
 		</div>
 	</p-tabPanel>
 </p-tabView>

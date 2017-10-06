@@ -29,7 +29,7 @@ export class JobService {
 	}
 
 	changeStatus(jobId: number, status: string): Promise<any> {
-		return this.datasource.postData(`update/Job/jobId/${jobId}`, {status: status})
+		return this.datasource.putData(`update/Job/jobId/${jobId}`, {status: status})
 		.then( res => {
 			console.log('status changed');
 		});
@@ -65,5 +65,12 @@ export class JobService {
 	createJob(job: Job): Promise<any> {
 		// Transform job start/end into mySql DATETIME strings
 		return this.datasource.postData('create/Job', job);
+	}
+
+	updateJob(jobId: number, update): Promise<any> {
+		return this.datasource.putData(`update/Job/jobId/${jobId}`, update)
+			.then( res => {
+				console.log(res);
+			});
 	}
 }

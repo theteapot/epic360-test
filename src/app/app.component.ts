@@ -40,15 +40,72 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		}
 	];
 
-	resources = [
-		{
-			id: 'new',
-			name: 'Add new job'
-		},
-	];
+	resources = [];
 
 	constructor(private staffService: StaffService, private jobService: JobService,
 		private equipmentService: EquipmentService, private taskService: TaskService) { }
+
+	ngOnInit() {
+		const jobPromise = this.jobService.getJobs().then(jobs => {
+
+			this.resources.push({
+				id: 'new',
+				title: 'Add new job',
+				type: 'new'
+			});
+
+			for (let job of jobs) {
+				if (job.status === 'active') {
+					this.resources.push({
+						id: job.jobId,
+						title: job.title,
+						type: 'job'
+					});
+					this.events.push({
+						id: job.jobId,
+						title: job.title,
+						type: 'job',
+						start: job.start,
+						end: job.end,
+						resourceId: job.jobId
+					});
+				}
+			}
+		});
+
+		const staffPromise = this.staffService.getStaffAssignment().then(staffView => {
+			for (let staff of staffView) {
+				this.resources.push({
+					id: `${staff.jobId}-${staff.staffId}`,
+					title: `${staff.firstName} ${staff.lastName}`,
+					parentId: staff.jobId,
+					type: 'staff'
+				});
+			}
+		});
+
+		const taskPromise = this.taskService.getTasks().then(tasks => {
+			console.log('all tasks', tasks);
+			for (let task of tasks) {
+				this.events.push({
+					id: task.taskId,
+					resourceId: `${task.jobId}-${task.staffId}`,
+					title: `${task.registration}: ${task.description}`,
+					start: task.start,
+					end: task.end,
+					type: 'task'
+				});
+			}
+		});
+
+		Promise.all([jobPromise, staffPromise, taskPromise]).then(() => {
+			console.log('got resources', this.resources);
+			console.log('got events', this.events);
+			this.createScheduler();
+			this.scrollTo();
+			this.ngAfterViewInit();
+		});
+	}
 
 	createScheduler(): any {
 		this.nestedScheduler = $('#scheduler3');
@@ -70,7 +127,6 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			editable: true,
 			droppable: true,
 			slotwidth: 100,
-			aspectRatio: 2.5,
 			eventoverlap: false,
 			drop: (date, jsEvent, ui, resourceId) => {
 				console.log('drop', date, jsEvent, ui, resourceId);
@@ -101,9 +157,6 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			eventDrop: (event, delta, revertFunc, ui, view) => {
 				this.eventDrop(event, delta, revertFunc, ui, view);
 			},
-			resourceText: (resource) => {
-				return this.getResourceText(resource);
-			},
 			resourceRender: (res, label, body) => {
 				$(label.prevObject).attr('type', 'job');
 				console.log('resource render', body.prevObject, label);
@@ -111,10 +164,6 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			events: this.events,
 			resources: this.resources
 		});
-	}
-
-	ngOnInit() {
-		this.createScheduler();
 	}
 
 	ngAfterViewChecked() {
@@ -171,7 +220,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 			hoverClass: 'highlight'
 		});
 
-		// Creating the job resource droppables for dropping staff onto jobs
+		// Dropping staff onto jobs
 		$('.fc-body .fc-resource-area tr[data-resource-id != "new"]').droppable({
 			drop: (event, ui) => {
 				// Dropping on row element
@@ -186,7 +235,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 				// If you drag a staff element onto a job element
 				if (elementType === 'staff' && resourceType === 'job') {
 					const resource = {
-						id: `${resourceId}-${elementId}`, type: elementType, name: elementName, parentId: resourceId
+						id: `${resourceId}-${elementId}`, type: elementType, title: elementName, parentId: resourceId
 					};
 					this.nestedScheduler.fullCalendar('addResource', resource);
 					this.updateResources(resource);
@@ -212,11 +261,28 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 	eventResize(event, delta, revertFunc, ui, view) {
 		// Updates DB when an event is resized, both for tasks and jobs
 		console.log('event resize', event, delta);
+		if (event.type === 'task') {
+			this.taskService.updateTask(event.id, { start: event.start, end: event.end });
+		} else if (event.type === 'job') {
+			this.jobService.updateJob(event.id, { start: event.start, end: event.end });
+		}
+
 	}
 
 	eventDrop(event, delta, revertFunc, ui, view) {
 		// Updates DB when an event is moved (within the same resource or between)
 		console.log('event drop', event, delta);
+		if (event.type === 'job') {
+			// Shouldnt do anything if jobs are dropped around - hopefully should stop this behaviour
+		} else if (event.type === 'task') {
+			// Update the tasks staff assignment, and job assignment
+			this.taskService.updateTask(event.id, {
+				staffId: event.resourceId.split('-')[1],
+				jobId: event.resourceId.split('-')[0],
+				start: event.start.format('YYYY-MM-DD hh:mm:ss'),
+				end: event.end.format('YYYY-MM-DD hh:mm:ss')
+			});
+		}
 	}
 
 	updateResources(resource) {
@@ -224,13 +290,17 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		if (resource.type === 'job') {
 			console.log('create job', resource);
 		} else if (resource.type === 'staff') {
-			console.log('assign staff to job', resource);
+			const staffId = resource.id.split('-')[1];
+			const jobId = resource.id.split('-')[0];
+			console.log('assign staff to job', staffId, jobId);
+			this.staffService.assignStaff(jobId, staffId);
 		}
 	}
 
 	eventReceive(event) {
 		// Handle the dropping of external events onto the calendar
 		// Remove the event that the calendar initially creates
+		console.log('event recieve', event);
 		const eventId = event._id;
 		this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
 			if (filterEvent._id === eventId) {
@@ -241,8 +311,14 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		});
 		// Add in our own events
 		this.renderMultipleEvents(event);
-		this.createEvent(event);
+		// this.createEvent(event);
 		// Update the DB
+		const taskId = event.taskId;
+		const staffId = event.resourceId.split('-')[1];
+		const start = event.start.format('YYYY-MM-DD hh:mm:ss');
+		const end = event.end ? event.end.format('YYYY-MM-DD hh:mm:ss') : event.start.add(1, 'hours').format('YYYY-MM-DD hh:mm:ss');
+		console.log('start', start, 'end', end);
+		this.taskService.updateTask(taskId, { staffId: staffId, start: start, end: end });
 	}
 
 	renderMultipleEvents(parent) {
@@ -262,16 +338,16 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 				resourceId: parent.resourceId
 			};
 			this.nestedScheduler.fullCalendar('renderEvent', event);
-			this.createEvent(event); // Update the DB
+			// this.createEvent(event); // Update the DB
 			// this.events.push(event);
 		}
 	}
 
-	createEvent(event) {
+	/*createEvent(event) {
 		// Given an event object, add it to the events array, creating multiple entries if required
 		console.log('create event', event);
-		this.events.push(event);
-	}
+		this.taskService.assignStaff();
+	}*/
 
 	updateEvent(event) {
 		// Given an event object, update the corresponding DB table with its information
@@ -283,7 +359,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		}
 	}
 
-	getResourceText(resource): string {
+	/* getResourceText(resource): string {
 		// Gets the appropriate resource text
 		console.log('resourceText', resource);
 		if (resource.type === 'job') {
@@ -291,7 +367,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 		} else if (resource.type === 'staff') {
 			return resource.name;
 		}
-	}
+	}*/
 
 	hasher(str: string): string {
 		let hash = 0;

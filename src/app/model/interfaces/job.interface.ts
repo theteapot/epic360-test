@@ -7,6 +7,7 @@ export interface Job extends SelectItem {
 	jobTypeId: number;
 	type: string;
 	title: string;
+	status: string;
 	start: any; // These should be moment objects
 	end: any; // These should be moment objects
 }
