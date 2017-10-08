@@ -29,9 +29,9 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	staff: Staff[];
 
-	selectedJob: any;
+	selectedJob: any = -1;
 
-	selectedTaskPanel: string; // Keeps track of whether we are in the assigning or creating task page.
+	selectedTaskPanel: string = 'assign'; // Keeps track of whether we are in the assigning or creating task page.
 	taskPanelOptions: any[];
 
 	newTaskForm: FormGroup;
