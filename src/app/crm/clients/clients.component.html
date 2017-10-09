@@ -1,0 +1,47 @@
+
+<div class="row">
+	<div class="col-6">
+		<p-dropdown [options]="clients" [(ngModel)]="selectedClient"></p-dropdown>
+		<button pButton type="button" (click)="showClientForm = !showClientForm" label="Add Client"></button>
+		<div *ngIf="selectedClient">
+			<p-dataList [value]="selectedClient.contacts">
+				<ng-template let-contact pTemplate="item">
+					{{contact.name}} {{contact.cellphone}}
+				</ng-template>
+			</p-dataList>
+			<button *ngIf="selectedClient" pButton type="button" (click)="showContactForm = !showContactForm" label="Add Contact"></button>
+			<p-dataList [value]="selectedClient.offices">
+				<ng-template let-office pTemplate="item">
+					{{office.street}} {{office.city}}
+				</ng-template>
+			</p-dataList>
+			<button *ngIf="selectedClient" pButton type="button" (click)="showOfficeForm = !showOfficeForm" label="Add Office"></button>
+		</div>
+	</div>
+	<div class="col-6">
+		<form *ngIf="showClientForm" [formGroup]="clientForm">
+			<input type="text" pInputText formControlName="name">
+			<textarea pInputTextarea formControlName="description"></textarea>
+			<button pButton type="button" (click)="createClient()" label="Create Client"></button>	
+		</form>
+		
+		<form *ngIf="showContactForm" [formGroup]="contactForm">
+			<input type="text" pInputText formControlName="name">
+			<input type="text" pInputText formControlName="address">
+			<input type="text" pInputText formControlName="email">
+			<input type="text" pInputText formControlName="cellphone">
+			<button pButton type="button" (click)="createContact()" label="Create Contact"></button>	
+		</form>
+		
+		<form *ngIf="showOfficeForm" [formGroup]="officeForm">
+			<input type="text" pInputText formControlName="street">
+			<input type="text" pInputText formControlName="suburb">
+			<input type="text" pInputText formControlName="city">
+			<input type="text" pInputText formControlName="postCode">
+			<button pButton type="button" (click)="createOffice()" label="Create Office"></button>	
+		</form>
+	</div>
+</div>
+
+
+

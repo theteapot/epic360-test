@@ -9,14 +9,14 @@ import * as moment from 'moment';
 @Injectable()
 export class JobService {
 
-	constructor(private datasource: EpicDbDatasource) {	}
+	constructor(private datasource: EpicDbDatasource) { }
 
 	getJobs(): Promise<Job[]> {
 		return this.datasource.getData('read/JobView')
-			.then( res => {
+			.then(res => {
 				const data: Job[] = [];
 				res.forEach(element => {
-					element.value = element.jobId;
+					element.value = element;
 					element.label = element.title;
 					// Creating date objects from mysql DATETIME strings
 					element.start = moment(element.start);
@@ -28,17 +28,25 @@ export class JobService {
 			});
 	}
 
+	getSiteVisits(jobId: number): Promise<any[]> {
+		return this.datasource.getData(`read/SiteVisit/jobId/${jobId}`);
+	}
+
+	getFollowUps(jobId: number): Promise<any[]> {
+		return this.datasource.getData(`read/FollowUp/jobId/${jobId}`);
+	}
+
 	changeStatus(jobId: number, status: string): Promise<any> {
-		return this.datasource.putData(`update/Job/jobId/${jobId}`, {status: status})
-		.then( res => {
-			console.log('status changed');
-		});
+		return this.datasource.putData(`update/Job/jobId/${jobId}`, { status: status })
+			.then(res => {
+				console.log('status changed');
+			});
 	}
 
 
 	getJobTemplates(): Promise<Job[]> {
 		return this.datasource.getData('read/JobTemplate')
-			.then( res => {
+			.then(res => {
 				const data: Job[] = [];
 				res.forEach(element => {
 					element.value = element.jobId;
@@ -51,7 +59,7 @@ export class JobService {
 
 	getJobTypes(): Promise<JobType[]> {
 		return this.datasource.getData('read/JobType')
-			.then( res => {
+			.then(res => {
 				const data: JobType[] = [];
 				res.forEach(element => {
 					element.value = element.jobTypeId;
@@ -67,9 +75,19 @@ export class JobService {
 		return this.datasource.postData('create/Job', job);
 	}
 
+	createFollowUp(jobId: number, followUpData: any) {
+		followUpData.jobId = jobId;
+		return this.datasource.postData('create/FollowUp', followUpData);
+	}
+
+	createSiteVisit(jobId: number, siteVisitData: any) {
+		siteVisitData.jobId = jobId;
+		return this.datasource.postData('create/SiteVisit', siteVisitData);
+	}
+
 	updateJob(jobId: number, update): Promise<any> {
 		return this.datasource.putData(`update/Job/jobId/${jobId}`, update)
-			.then( res => {
+			.then(res => {
 				console.log(res);
 			});
 	}

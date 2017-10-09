@@ -6,18 +6,23 @@ import { AppComponent } from './app.component';
 import { StagingAreaComponent } from './staging-area/staging-area.component';
 import { DragulaModule } from 'ng2-dragula/ng2-dragula';
 import {
-	TabViewModule, DataListModule, DialogModule, ButtonModule, DropdownModule, SelectButtonModule
+	TabViewModule, DataListModule, DialogModule, ButtonModule, DropdownModule, SelectButtonModule,
+	PanelModule, CalendarModule
 } from 'primeng/primeng';
 import { ModelModule } from './model/model.module';
+import { CrmModule } from './crm/crm.module';
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		StagingAreaComponent,
+		StagingAreaComponent
 	],
 	imports: [
 		ModelModule,
+		CrmModule,
 		TabViewModule,
+		CalendarModule,
+		PanelModule,
 		SelectButtonModule,
 		DataListModule,
 		TabViewModule,

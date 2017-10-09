@@ -1,0 +1,10 @@
+<div class="row">
+	<form [formGroup]="leadForm">
+		<input type="text" pInputText formControlName="name">
+		<p-dropdown [options]="jobActions" formControlName="action"></p-dropdown>
+		<p-dropdown [options]="jobTypes" formControlName="type"></p-dropdown>
+		<p-dropdown *ngIf="leadForm.value.type==='builder'" [options]="builderSubtypes" formControlName="subtype"></p-dropdown>
+		<textarea pInputTextarea formControlName="description"></textarea>
+		<button pButton type="button" (click)="createLead()" label="Create Lead"></button>
+	</form>
+</div>

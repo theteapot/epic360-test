@@ -29,7 +29,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	staff: Staff[];
 
-	selectedJob: any = -1;
+	selectedJob: Job;
 
 	selectedTaskPanel: string = 'assign'; // Keeps track of whether we are in the assigning or creating task page.
 	taskPanelOptions: any[];
@@ -186,7 +186,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 	filterTasks() {
 		// Filters the tasks
 		this.filteredTasks = this.tasks.filter(task => {
-			return task.jobId === this.selectedJob;
+			return task.jobId === this.selectedJob.jobId;
 		});
 		console.log('task filter', this.filteredTasks);
 		this.initDraggables('.draggable.task');
@@ -194,7 +194,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 	createTask() {
 		const task = {
-			jobId: this.selectedJob,
+			jobId: this.selectedJob.jobId,
 			header: this.newTaskForm.value.header,
 			description: this.newTaskForm.value.description,
 			workType: this.newTaskForm.value.workType

@@ -1,0 +1,51 @@
+<div class="row">
+	<p-dropdown [options]="jobs" [(ngModel)]="selectedJob" (onChange)="getJobDetails($event)"></p-dropdown>
+	
+	<p-dataList [value]="followUps">
+		<ng-template let-followUp pTemplate="item">
+			{{followUp | json}}
+		</ng-template>
+	</p-dataList>
+	<p-dataList [value]="siteVisits">
+		<ng-template let-siteVisit pTemplate="item">
+			{{siteVisit | json}}
+		</ng-template>
+	</p-dataList>
+
+
+	<button pButton type="button" (click)="showJobForm =! showJobForm" label="Create Job"></button>		
+	<form [formGroup]="jobForm" *ngIf="showJobForm">
+		<input pInput type="text" formControlName="title">
+		<p-dropdown [options]="jobTypes" formControlName="jobTypeId"></p-dropdown>
+		<textarea pInputTextarea formControlName="description"></textarea>
+
+		<div class="ui-inputgroup">
+			<span class="ui-inputgroup-addon">$</span>
+			<input type="text" pInputText placeholder="Price" formControlName="estValue">   
+			<span class="ui-inputgroup-addon">.00</span>      
+		</div>
+
+		<p-dropdown [options]="originOptions" formControlName="origin"></p-dropdown>
+
+		<input pInput type="text" formControlName="street">
+		<input pInput type="text" formControlName="suburb">
+		<input pInput type="text" formControlName="city">
+
+		<p-calendar selectionMode="range" readonlyInput="true" formControlName="dateRange"></p-calendar>
+		<button pButton type="button" (click)="createJob()" label="Create Job"></button>	
+	</form>
+
+	<form [formGroup]="followUpForm" *ngIf="selectedJob">
+		<textarea pInputTextarea formControlName="description"></textarea>			
+		<p-calendar readonlyInput="true" [showIcon]="true" formControlName="date"></p-calendar>
+		<p-dropdown [options]="staff" formControlName="staff"></p-dropdown>
+		<button pButton type="button" (click)="createFollowUp()" label="Create Follow-Up"></button>	
+	</form>
+
+	<form [formGroup]="siteVisitForm" *ngIf="selectedJob">
+		<p-dropdown [options]="staff" formControlName="staff"></p-dropdown>
+		<p-calendar readonlyInput="true" [showIcon]="true" formControlName="start"></p-calendar>
+		<textarea pInputTextarea formControlName="description"></textarea>
+		<button pButton type="button" (click)="createSiteVisit()" label="Create Site-Visit"></button>						
+	</form>
+</div>

@@ -331,7 +331,7 @@ export class AppComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
 		// Get title array
 		const eventEquipment = parent.equipment;
-		console.log('render events', parent)
+		console.log('render events', parent);
 		for (const equip of eventEquipment) {
 			const event = {
 				title: `${equip} : ${parent.title}`,

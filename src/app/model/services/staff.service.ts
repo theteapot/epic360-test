@@ -16,7 +16,7 @@ export class StaffService {
 			.then( res => {
 				const data: Staff[] = [];
 				res.forEach(element => {
-					element.value = element.staffId;
+					element.value = element;
 					element.label = `${element.firstName} ${element.lastName}`;
 					data.push(element);
 				});
