@@ -1,0 +1,15 @@
+<p-panel header="Site Visit">
+	<p-fieldset legend="Description">
+		{{siteVisit.description}}
+		{{siteVisit.dataDescription}}
+	</p-fieldset>
+	<p-fieldset legend="Measurements">
+		{{siteVisit.dataMeasurements}}
+	</p-fieldset>
+	<p-dataList [value]="pictures" [paginator]="true" [rows]="1">
+		<ng-template let-picture pTemplate="item">
+			<img [src]="picture.data" height="200">
+			<p>{{picture.description}}</p>
+		</ng-template>
+	</p-dataList>
+</p-panel>

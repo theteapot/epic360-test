@@ -29,7 +29,11 @@ export class JobService {
 	}
 
 	getSiteVisits(jobId: number): Promise<any[]> {
-		return this.datasource.getData(`read/SiteVisit/jobId/${jobId}`);
+		return this.datasource.getData(`read/SiteVisitView/jobId/${jobId}`);
+	}
+
+	getSiteVisitPictures(siteVisitId: number): Promise<{ data: string, description: string }[]> {
+		return this.datasource.getData(`picture/siteVisitid/${siteVisitId}`);
 	}
 
 	getFollowUps(jobId: number): Promise<any[]> {
