@@ -1,39 +1,24 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppComponent } from './app.component';
-import { StagingAreaComponent } from './staging-area/staging-area.component';
-import { DragulaModule } from 'ng2-dragula/ng2-dragula';
-import {
-	TabViewModule, DataListModule, DialogModule, ButtonModule, DropdownModule, SelectButtonModule,
-	PanelModule, CalendarModule
-} from 'primeng/primeng';
-import { ModelModule } from './model/model.module';
+
+import { TabMenuModule, MenuItem } from 'primeng/primeng';
+
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { CrmModule } from './crm/crm.module';
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		StagingAreaComponent
 	],
 	imports: [
-		ModelModule,
+		AppRoutingModule,
 		CrmModule,
-		TabViewModule,
-		CalendarModule,
-		PanelModule,
-		SelectButtonModule,
-		DataListModule,
-		TabViewModule,
-		BrowserModule,
-		DragulaModule,
-		DialogModule,
-		ButtonModule,
-		DropdownModule,
-		BrowserAnimationsModule,
-		FormsModule,
-		ReactiveFormsModule
+		SchedulerModule,
+		TabMenuModule,
+		BrowserModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

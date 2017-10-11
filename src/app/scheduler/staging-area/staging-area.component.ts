@@ -1,14 +1,14 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { DragulaService } from 'ng2-dragula/ng2-dragula';
-import { StaffService } from '../model/services/staff.service';
-import { TaskService } from '../model/services/task.service';
-import { EquipmentService } from '../model/services/equipment.service';
-import { JobService } from '../model/services/job.service';
-import { Staff } from '../model/interfaces/staff.interface';
-import { Task } from '../model/interfaces/task.interface';
-import { Equipment } from '../model/interfaces/equipment.interface';
-import { Job } from '../model/interfaces/job.interface';
+import { StaffService } from '../../model/services/staff.service';
+import { TaskService } from '../../model/services/task.service';
+import { EquipmentService } from '../../model/services/equipment.service';
+import { JobService } from '../../model/services/job.service';
+import { Staff } from '../../model/interfaces/staff.interface';
+import { Task } from '../../model/interfaces/task.interface';
+import { Equipment } from '../../model/interfaces/equipment.interface';
+import { Job } from '../../model/interfaces/job.interface';
 
 
 declare var $: any;
@@ -57,7 +57,6 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			workType: ['', Validators.required],
 		});
 
-		this.initialiseDragula(dragulaService);
 	}
 
 	ngOnInit() {
@@ -79,6 +78,9 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			this.tasks = tasks;
 			this.initDraggables('.draggable.task');
 		});
+
+		this.initialiseDragula(this.dragulaService);
+		
 	}
 
 	initialiseDragula(dragulaService: DragulaService) {
