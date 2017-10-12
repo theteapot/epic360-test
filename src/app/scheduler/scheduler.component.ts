@@ -140,7 +140,9 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 					element.addClass('employee-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
 				} else if (event.type === 'task') {
-					element.addClass('task-event');
+					element.addClass('.task-event');
+					// Assumes every event has title = '[plant]:[desc]'
+					element.css('background-color', '#' + sha1(event.title.split(':')[0]).slice(0, 6));
 				} else {
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
 				}
@@ -158,8 +160,9 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 				this.eventDrop(event, delta, revertFunc, ui, view);
 			},
 			resourceRender: (res, label, body) => {
-				$(label.prevObject).attr('type', 'job');
-				console.log('resource render', body.prevObject, label);
+				console.log('resource render 1', res, label, body);
+				$(label.prevObject).attr('type', res.type);
+				console.log('resource render 2', body.prevObject, label);
 			},
 			events: this.events,
 			resources: this.resources
@@ -222,7 +225,7 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		});
 
 		// Dropping staff onto jobs
-		$('.fc-body .fc-resource-area tr[data-resource-id != "new"]').droppable({
+		$('.fc-body .fc-resource-area tr[type="job"]').droppable({
 			drop: (event, ui) => {
 				// Dropping on row element
 				console.log($(event.target));
@@ -303,14 +306,14 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		// Handle the dropping of external events onto the calendar
 		// Remove the event that the calendar initially creates
 		console.log('event recieve', event);
-		/*const eventId = event._id;
+		const eventId = event._id;
 		this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
 			if (filterEvent._id === eventId) {
 				return true;
 			} else {
 				return false;
 			}
-		});*/
+		});
 		// Add in our own events
 		this.renderMultipleEvents(event);
 		// this.createEvent(event);

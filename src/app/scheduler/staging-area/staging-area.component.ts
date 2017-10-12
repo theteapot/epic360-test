@@ -120,10 +120,16 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			// Post to the DB
 			const equipmentId = $(value[1]).attr('equipmentId');
 			const taskId = $(value[2]).attr('taskId');
+			console.log('assign data', $(value[2]).parents('.draggable').data('event'));
 			this.taskService.assignEquipment(taskId, equipmentId);
 		});
 
 		dragulaService.remove.subscribe((value) => {
+			// Remove from the item
+			const data = $(value[2]).parents('.draggable').data('event');
+			data.equipment = [];
+			$(value[2]).parents('.draggable').data('event', data);
+			console.log('remove data', data);
 			// Post to the DB
 			const taskId = $(value[2]).attr('taskId');
 			this.taskService.unassignEquipment(taskId);
