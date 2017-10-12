@@ -16,23 +16,42 @@
 	<button pButton type="button" (click)="showJobForm =! showJobForm" label="Create Job"></button>		
 	<p-panel *ngIf="showJobForm" header="Create Job" class="ui-grid ui-grid-responsive ui-fluid">
 		<form [formGroup]="jobForm" *ngIf="showJobForm" >
-			<input pInput type="text" formControlName="title">
-			<p-dropdown [options]="jobTypes" formControlName="jobTypeId"></p-dropdown>
-			<textarea pInputTextarea formControlName="description"></textarea>
-	
-			<div class="ui-inputgroup">
-				<span class="ui-inputgroup-addon">$</span>
-				<input type="text" pInputText placeholder="Price" formControlName="estValue">   
-				<span class="ui-inputgroup-addon">.00</span>      
+			<div class="ui-grid-row">						
+				<input pInput type="text" formControlName="title">
 			</div>
-	
-			<p-dropdown [options]="originOptions" formControlName="origin"></p-dropdown>
-	
-			<input pInput type="text" formControlName="street">
-			<input pInput type="text" formControlName="suburb">
-			<input pInput type="text" formControlName="city">
-	
-			<p-calendar selectionMode="range" readonlyInput="true" formControlName="dateRange"></p-calendar>
+			<div class="ui-grid-row">
+				<p-dropdown [options]="jobTypes" formControlName="jobTypeId" placeholder="Select Job Type"></p-dropdown>
+			</div>	
+			<div class="ui-grid-row">
+				<textarea pInputTextarea formControlName="description"></textarea>
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-inputgroup">
+					<span class="ui-inputgroup-addon">$</span>
+					<input type="text" pInputText placeholder="Price" formControlName="estValue">   
+					<span class="ui-inputgroup-addon">.00</span>      
+				</div>
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="jobOrigin">Job Origin</label></div>					
+				<p-dropdown [options]="originOptions" id="jobOrigin" formControlName="origin" placeholder="Select Job Origin"></p-dropdown>
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="jobAddress">Job Address</label></div>					
+				<input pInput type="text" id="jobAddress" formControlName="street">	
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="jobSuburb">Job Suburb</label></div>					
+				<input pInput type="text" id="jobSuburb" formControlName="suburb">
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="jobCity">Job City</label></div>					
+				<input pInput type="text" id="jobCity" formControlName="city">
+			</div>	
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="jobRange">Expected Timeframe</label></div>					
+				<p-calendar selectionMode="range" id="jobRange" readonlyInput="true" formControlName="dateRange"></p-calendar>
+			</div>
 			<button pButton type="button" (click)="createJob()" label="Create Job"></button>	
 		</form>
 	</p-panel>
@@ -40,10 +59,18 @@
 
 	<p-panel header="Follow Up">
 		<form [formGroup]="followUpForm" *ngIf="selectedJob">
-			<textarea pInputTextarea formControlName="description"></textarea>			
-			<p-calendar readonlyInput="true" [showIcon]="true" formControlName="date"></p-calendar>
-			<p-dropdown [options]="staff" formControlName="staff"></p-dropdown>
-			<button pButton type="button" (click)="createFollowUp()" label="Create Follow-Up"></button>	
+			<div class="ui-grid-row">
+				<textarea pInputTextarea formControlName="description"></textarea>			
+			</div>
+			<div class="ui-grid-row">
+				<p-calendar readonlyInput="true" [showIcon]="true" formControlName="date"></p-calendar>
+			</div>
+			<div class="ui-grid-row">
+				<p-dropdown [options]="staff" formControlName="staff" placehold></p-dropdown>
+			</div>
+			<div class="ui-grid-row">
+				<button pButton type="button" (click)="createFollowUp()" label="Create Follow-Up"></button>	
+			</div>
 		</form>
 	</p-panel>
 	
