@@ -1,10 +1,25 @@
-<div class="row">
+<p-panel class="ui-grid ui-grid-responsive ui-fluid" header="Lead">
 	<form [formGroup]="leadForm">
-		<input type="text" pInputText formControlName="name">
-		<p-dropdown [options]="jobActions" formControlName="action"></p-dropdown>
-		<p-dropdown [options]="jobTypes" formControlName="type"></p-dropdown>
-		<p-dropdown *ngIf="leadForm.value.type==='builder'" [options]="builderSubtypes" formControlName="subtype"></p-dropdown>
-		<textarea pInputTextarea formControlName="description"></textarea>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="leadName">Name</label></div>
+			<input class="ui-grid-col-8" type="text" id="leadName" pInputText formControlName="name">
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="leadName">Action</label></div>
+			<p-dropdown [options]="jobActions" id="jobActions" placeholder="Select Action" formControlName="action"></p-dropdown>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="leadName">Type</label></div>
+			<p-dropdown [options]="jobTypes" if="leadType" placeholder="Select Type" formControlName="type"></p-dropdown>	
+		</div>
+		<div class="ui-grid-row" *ngIf="leadForm.value.type==='builder'">
+			<div class="ui-grid-col-4"><label for="leadName">Builder Type</label></div>
+			<p-dropdown id="builderType" [options]="builderSubtypes" placeholder="Select Sub-Type" formControlName="subtype"></p-dropdown>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="leadDescription">Description</label></div>
+			<textarea pInputTextarea id="leadDescription" formControlName="description"></textarea>
+		</div>
 		<button pButton type="button" (click)="createLead()" label="Create Lead"></button>
 	</form>
-</div>
+</p-panel>

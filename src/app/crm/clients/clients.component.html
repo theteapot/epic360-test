@@ -1,47 +1,83 @@
 
-<div class="row">
-	<div class="col-6">
-		<p-dropdown [options]="clients" [(ngModel)]="selectedClient"></p-dropdown>
-		<button pButton type="button" (click)="showClientForm = !showClientForm" label="Add Client"></button>
-		<div *ngIf="selectedClient">
+<p-panel class="ui-grid ui-grid-responsive ui-fluid" header="Client">
+	<div class="ui-grid-row">
+		<p-dropdown class="ui-grid-col-8" [options]="clients" placeholder="Client" [(ngModel)]="selectedClient"></p-dropdown>
+		<button pButton type="button" (click)="showClientForm = !showClientForm" label="Create Client"></button>
+	</div>	
+	<div class="ui-grid-row" *ngIf="selectedClient">
+		<div class="ui-grid-col-6">
 			<p-dataList [value]="selectedClient.contacts">
+				<p-header>
+					Contacts
+				</p-header>
 				<ng-template let-contact pTemplate="item">
-					{{contact.name}} {{contact.cellphone}}
+					Name: {{contact.name}}
+					Cell: {{contact.cellphone}}
 				</ng-template>
 			</p-dataList>
 			<button *ngIf="selectedClient" pButton type="button" (click)="showContactForm = !showContactForm" label="Add Contact"></button>
+		</div>
+		<div class="ui-grid-col-6">
 			<p-dataList [value]="selectedClient.offices">
+				<p-header>
+					Offices
+				</p-header>
 				<ng-template let-office pTemplate="item">
-					{{office.street}} {{office.city}}
+					Street: {{office.street}}
+					City: {{office.city}}
 				</ng-template>
 			</p-dataList>
 			<button *ngIf="selectedClient" pButton type="button" (click)="showOfficeForm = !showOfficeForm" label="Add Office"></button>
 		</div>
-	</div>
-	<div class="col-6">
-		<form *ngIf="showClientForm" [formGroup]="clientForm">
-			<input type="text" pInputText formControlName="name">
-			<textarea pInputTextarea formControlName="description"></textarea>
-			<button pButton type="button" (click)="createClient()" label="Create Client"></button>	
-		</form>
 		
-		<form *ngIf="showContactForm" [formGroup]="contactForm">
-			<input type="text" pInputText formControlName="name">
-			<input type="text" pInputText formControlName="address">
-			<input type="text" pInputText formControlName="email">
-			<input type="text" pInputText formControlName="cellphone">
-			<button pButton type="button" (click)="createContact()" label="Create Contact"></button>	
-		</form>
-		
-		<form *ngIf="showOfficeForm" [formGroup]="officeForm">
-			<input type="text" pInputText formControlName="street">
-			<input type="text" pInputText formControlName="suburb">
-			<input type="text" pInputText formControlName="city">
-			<input type="text" pInputText formControlName="postCode">
-			<button pButton type="button" (click)="createOffice()" label="Create Office"></button>	
-		</form>
 	</div>
-</div>
+</p-panel>
+
+<p-panel *ngIf="showClientForm" class="ui-grid ui-grid-responsive ui-fluid" header="Create Client">
+	<form *ngIf="showClientForm" [formGroup]="clientForm">
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="clientName">Client Name</label></div>
+			<input type="text" pInputText id="clientName" formControlName="name">
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="clientDescription">Client Description</label></div>					
+			<textarea pInputTextarea if="clientDescription" formControlName="description"></textarea>
+		</div>				
+		<button pButton type="button" (click)="createClient()" label="Create Client"></button>	
+	</form>
+</p-panel>
+
+<p-panel *ngIf="showContactForm" class="ui-grid ui-grid-responsive ui-fluid" header="Create Contact">
+	<form [formGroup]="contactForm">
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="contactName">Name</label></div>
+			<input type="text" pInputText if="contactName" formControlName="name">
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="contactAddress">Address</label></div>
+			<input type="text" pInputText id="contactAddress" formControlName="address">
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="contactEmail">Email</label></div>
+			<input type="text" pInputText id="contactEmail" formControlName="email">
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="contactPhone">Phone</label></div>				
+			<input type="text" pInputText id="contactPhone" formControlName="cellphone">
+		</div>
+		<button pButton type="button" (click)="createContact()" label="Create Contact"></button>	
+	</form>
+</p-panel>
+
+<p-panel *ngIf="showOfficeForm" class="ui-grid ui-grid-responsive ui-fluid" header="Create Office">
+	<form [formGroup]="officeForm">
+		<input type="text" pInputText formControlName="street">
+		<input type="text" pInputText formControlName="suburb">
+		<input type="text" pInputText formControlName="city">
+		<input type="text" pInputText formControlName="postCode">
+		<button pButton type="button" (click)="createOffice()" label="Create Office"></button>	
+	</form>
+</p-panel>
 
 
 

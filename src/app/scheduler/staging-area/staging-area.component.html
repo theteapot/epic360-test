@@ -19,7 +19,11 @@
 	</p-tabPanel>
 
 	<p-tabPanel header="Staging">
-		<p-dropdown [options]="jobs" [(ngModel)]="selectedJob" (onChange)="filterTasks($event)" placeholder="Select Job"></p-dropdown>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="jobSelect">Job</label></div>
+			<p-dropdown id="jobSelect" class="ui-grid-col-6" [options]="jobs" [(ngModel)]="selectedJob" (onChange)="filterTasks($event)" placeholder="Select Job"></p-dropdown>
+		</div>
+		
 		<p-selectButton [options]="taskPanelOptions" [(ngModel)]="selectedTaskPanel" (click)="taskPanelChange()"></p-selectButton>
 		<div class="row" *ngIf="selectedTaskPanel==='assign'">
 			<div class="col-6 wrapper">
