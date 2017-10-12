@@ -57,6 +57,11 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			workType: ['', Validators.required],
 		});
 
+		// Only create the service if it doesnt exist
+		if (!this.dragulaService.find('first-bag')) {
+			this.initialiseDragula(this.dragulaService);
+		}
+
 	}
 
 	ngOnInit() {
@@ -79,12 +84,11 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			this.initDraggables('.draggable.task');
 		});
 
-		this.initialiseDragula(this.dragulaService);
-
 	}
 
 	initialiseDragula(dragulaService: DragulaService) {
 		// Sets up options for the dragulaService
+		console.log('dragula bag', dragulaService.find('first-bag'));
 		dragulaService.setOptions('first-bag', {
 			copy: (el, source) => {
 				console.log('copy', el, source);

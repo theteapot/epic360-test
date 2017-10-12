@@ -43,7 +43,9 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 	resources = [];
 
 	constructor(private staffService: StaffService, private jobService: JobService,
-		private equipmentService: EquipmentService, private taskService: TaskService) {
+		private equipmentService: EquipmentService, private taskService: TaskService) { }
+
+	ngOnInit() {
 		const jobPromise = this.jobService.getJobs().then(jobs => {
 
 			this.resources.push({
@@ -103,10 +105,6 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			this.scrollTo();
 			this.ngAfterViewInit();
 		});
-	}
-
-	ngOnInit() {
-
 	}
 
 	createScheduler(): any {
