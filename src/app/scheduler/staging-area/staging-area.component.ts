@@ -80,7 +80,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 		});
 
 		this.initialiseDragula(this.dragulaService);
-		
+
 	}
 
 	initialiseDragula(dragulaService: DragulaService) {
