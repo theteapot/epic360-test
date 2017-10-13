@@ -1,12 +1,12 @@
 import { Component, OnInit, AfterViewInit, Input, OnChanges, AfterViewChecked } from '@angular/core';
-import { StaffService } from '../model/services/staff.service';
-import { TaskService } from '../model/services/task.service';
-import { EquipmentService } from '../model/services/equipment.service';
-import { JobService } from '../model/services/job.service';
-import { Staff } from '../model/interfaces/staff.interface';
-import { Task } from '../model/interfaces/task.interface';
-import { Equipment } from '../model/interfaces/equipment.interface';
-import { Job } from '../model/interfaces/job.interface';
+import { StaffService } from '../../model/services/staff.service';
+import { TaskService } from '../../model/services/task.service';
+import { EquipmentService } from '../../model/services/equipment.service';
+import { JobService } from '../../model/services/job.service';
+import { Staff } from '../../model/interfaces/staff.interface';
+import { Task } from '../../model/interfaces/task.interface';
+import { Equipment } from '../../model/interfaces/equipment.interface';
+import { Job } from '../../model/interfaces/job.interface';
 
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
@@ -98,7 +98,20 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			}
 		});
 
-		Promise.all([jobPromise, staffPromise, taskPromise]).then(() => {
+		const staffPlaceholderPromise = this.staffService.getStaffPlaceholders().then(placeholders => {
+			for (let event of placeholders) {
+				this.events.push({
+					start: event.start,
+					end: event.end,
+					title: 'title',
+					resourceId: `${event.jobId}-${event.staffId}`,
+					rendering: 'background'
+				});
+			}
+			console.log(this.events);
+		});
+
+		Promise.all([jobPromise, staffPromise, taskPromise, staffPlaceholderPromise]).then(() => {
 			console.log('got resources', this.resources);
 			console.log('got events', this.events);
 			this.createScheduler();

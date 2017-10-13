@@ -1,5 +1,6 @@
-import { NgModule, Injectable, Inject, OpaqueToken } from '@angular/core'
+import { NgModule, Injectable, Inject, OpaqueToken } from '@angular/core';
 import { Http, Request, RequestMethod } from '@angular/http';
+import { MySQLResponse } from '../interfaces/mysql-response.interface';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 

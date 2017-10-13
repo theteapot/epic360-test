@@ -162,10 +162,11 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 				const event = {
 					title: $(drag).find('h4').text().trim() + ': ' + $(drag).find('.equipment .handle').text().trim(),
 					equipment: [],
-					equipmentId: $(drag).find('.equipment').attr('equipmentId'),
-					taskId: $(drag).find('.container').attr('taskId')
+					equipmentId: $(drag).find('.equipment').prevObject.attr('equipmentId'),
+					taskId: $(drag).find('.container').prevObject.attr('taskId'),
+					staffId: $(drag).find('.container').prevObject.attr('staffId')
 				};
-				console.log('drag event', event)
+				console.log('drag event', $(drag).find('container'), event);
 				$(drag).data('event', event);
 			} 	/* {
 					title:

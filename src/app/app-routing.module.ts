@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SchedulerComponent } from './scheduler/scheduler.component';
+import { SchedulerComponent } from './scheduler/task-scheduler/scheduler.component';
+import { StaffSchedulerComponent } from './scheduler/staff-scheduler/staff-scheduler.component';
 import { CrmComponent } from './crm/crm.component';
 
 const appRoutes: Routes = [
 	{ path: 'scheduler', component: SchedulerComponent },
 	{ path: 'crm', component: CrmComponent },
+	{ path: 'staff-scheduler', component: StaffSchedulerComponent },
 	{ path: '', redirectTo: '/scheduler', pathMatch: 'full' },
 	{ path: '**', component: CrmComponent }
 ];

@@ -9,7 +9,7 @@ export class LeadService {
 
 	constructor(private datasource: EpicDbDatasource) {	}
 
-	createLead(leadData: any): Promise<any[]> {
+	createLead(leadData: any): Promise<any> {
 		return this.datasource.postData('create/Lead', leadData);
 	}
 

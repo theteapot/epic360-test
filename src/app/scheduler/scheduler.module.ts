@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SchedulerComponent } from './scheduler.component';
+import { SchedulerComponent } from './task-scheduler/scheduler.component';
 import { StagingAreaComponent } from './staging-area/staging-area.component';
 import { DragulaModule } from 'ng2-dragula/ng2-dragula';
 import {
@@ -11,11 +11,13 @@ import {
 } from 'primeng/primeng';
 import { ModelModule } from '../model/model.module';
 import { CrmModule } from '../crm/crm.module';
+import { StaffSchedulerComponent } from './staff-scheduler/staff-scheduler.component';
 
 @NgModule({
 	declarations: [
 		SchedulerComponent,
-		StagingAreaComponent
+		StagingAreaComponent,
+		StaffSchedulerComponent
 	],
 	imports: [
 		ModelModule,
@@ -36,7 +38,8 @@ import { CrmModule } from '../crm/crm.module';
 		ReactiveFormsModule
 	],
 	exports: [
-		SchedulerComponent
+		SchedulerComponent,
+		StaffSchedulerComponent
 	],
 	providers: [],
 	bootstrap: []

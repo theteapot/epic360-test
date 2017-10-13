@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Staff } from '../interfaces/staff.interface';
+import { MySQLResponse } from '../interfaces/mysql-response.interface';
 import { EpicDbDatasource } from '../datasources/epic-db.datasource';
 import 'rxjs/add/operator/toPromise';
+import * as moment from 'moment';
 
 @Injectable()
 export class StaffService {
@@ -21,6 +23,36 @@ export class StaffService {
 					data.push(element);
 				});
 				return data;
+			});
+	}
+
+	getStaffPlaceholders(): Promise<any> {
+		return this.datasource.getData('read/StaffPlaceholder')
+		.then( res => {
+			res.forEach(placeholder => {
+				placeholder['start'] = placeholder.start ? moment(placeholder.start) : null;
+				placeholder['end'] = placeholder.start ? moment(placeholder.end) : null;
+			});
+			console.log('res', res);
+			return res;
+		});
+	}
+
+	createStaffPlaceholder(placeholder: any): Promise<MySQLResponse> {
+		// Creating a staff placeholder entry
+		return this.datasource.postData(`create/StaffPlaceholder`, placeholder)
+			.then(res => {
+				return res;
+			});
+	}
+
+	updateStaffPlaceholder(placeholder: any) {
+		// Creating a staff placeholder entry
+		placeholder.start = placeholder.start.format('YYYY-MM-DD hh:mm:ss');
+		placeholder.end = placeholder.end.format('YYYY-MM-DD hh:mm:ss');
+		return this.datasource.putData(`update/StaffPlaceholder/staffPlaceholderId/${placeholder.staffPlaceholderId}`, placeholder)
+			.then(res => {
+				console.log(res);
 			});
 	}
 
