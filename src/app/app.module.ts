@@ -7,7 +7,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { CrmModule } from './crm/crm.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
+import { QuotingModule } from './quoting/quoting.module';
 
 @NgModule({
 	declarations: [
@@ -17,6 +17,7 @@ import { AppRoutingModule } from './app-routing.module';
 		AppRoutingModule,
 		CrmModule,
 		SchedulerModule,
+		QuotingModule,
 		TabMenuModule,
 		BrowserModule
 	],

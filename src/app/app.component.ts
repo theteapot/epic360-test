@@ -11,8 +11,9 @@ export class AppComponent implements OnInit {
 
 	ngOnInit() {
 		this.mainMenu = [
-			{ label: 'Task Scheduler', routerLink: 'scheduler' },
-			{ label: 'Leads', routerLink: 'crm' }
+			{ label: 'Scheduler', routerLink: 'scheduler' },
+			{ label: 'Leads', routerLink: 'crm' },
+			{ label: 'Quotes', routerLink: 'quoting'}
 		];
 	}
 }
