@@ -12,12 +12,14 @@ import {
 import { ModelModule } from '../model/model.module';
 import { CrmModule } from '../crm/crm.module';
 import { StaffSchedulerComponent } from './staff-scheduler/staff-scheduler.component';
+import { SchedulerModuleComponent } from './scheduler-module.component';
 
 @NgModule({
 	declarations: [
 		SchedulerComponent,
 		StagingAreaComponent,
-		StaffSchedulerComponent
+		StaffSchedulerComponent,
+		SchedulerModuleComponent
 	],
 	imports: [
 		ModelModule,

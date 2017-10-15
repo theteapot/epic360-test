@@ -14,7 +14,7 @@ import * as fullCalendar from 'fullcalendar';
 declare var $: any;
 
 @Component({
-	selector: 'app-scheduler',
+	selector: 'app-task-scheduler',
 	templateUrl: './scheduler.component.html',
 	styleUrls: ['./scheduler.component.css']
 })
@@ -35,17 +35,18 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		{ label: 'P3036', value: 2 }
 	];
 
-	events = [
-		{
-		}
-	];
+	events = [{}];
 
 	resources = [];
 
 	constructor(private staffService: StaffService, private jobService: JobService,
-		private equipmentService: EquipmentService, private taskService: TaskService) { }
+		private equipmentService: EquipmentService, private taskService: TaskService) {
+
+
+	}
 
 	ngOnInit() {
+
 		const jobPromise = this.jobService.getJobs().then(jobs => {
 
 			this.resources.push({
