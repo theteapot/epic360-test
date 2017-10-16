@@ -7,7 +7,7 @@ import { StagingAreaComponent } from './staging-area/staging-area.component';
 import { DragulaModule } from 'ng2-dragula/ng2-dragula';
 import {
 	TabViewModule, DataListModule, DialogModule, ButtonModule, DropdownModule, SelectButtonModule,
-	PanelModule, CalendarModule
+	PanelModule, CalendarModule, CheckboxModule
 } from 'primeng/primeng';
 import { ModelModule } from '../model/model.module';
 import { CrmModule } from '../crm/crm.module';
@@ -29,6 +29,7 @@ import { SchedulerModuleComponent } from './scheduler-module.component';
 		PanelModule,
 		SelectButtonModule,
 		DataListModule,
+		CheckboxModule,
 		TabViewModule,
 		CommonModule,
 		DragulaModule,

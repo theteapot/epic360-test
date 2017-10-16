@@ -13,7 +13,7 @@
 	<p-tabPanel header="Staff">
 		<div class="row wrapper">
 			<div *ngFor="let s of staff" class="draggable staff" [attr.staffId]="s.staffId" [attr.name]="s.desc" [attr.type]="'staff'" [attr.name]="s.firstName + ' ' + s.lastName">
-				<h4 class="handle"><b>{{s.firstName}} {{s.lastName}}</b></h4>
+				<h4 class="handle"><b>{{s.name}}</b></h4>
 				<p>{{s.workType}}</p>
 			</div>
 		</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, OnChanges, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, AfterViewChecked } from '@angular/core';
 import { StaffService } from '../../model/services/staff.service';
 import { TaskService } from '../../model/services/task.service';
 import { EquipmentService } from '../../model/services/equipment.service';
@@ -25,14 +25,40 @@ export class StaffSchedulerComponent implements OnInit {
 
 	staffScheduler: any;
 	jobs: any;
+	staff: any;
+	@Input() selectedStaff: any[] = []; // Keeps track of the people who are selected
+
 	resources: { id: number, title: string, type: string }[] = [];
-	events: { staffId: any, title?: string, start: any, end?: string, rendering?: string, resourceId: number, placeholderId?: number }[] = [];
+	events: {
+		staffId: any,
+		title?: string,
+		start: any,
+		end?: string,
+		rendering?: string,
+		resourceId: number,
+		placeholderId?: number,
+		color?: string
+	}[] = [];
+	filteredResources: { id: number, title: string, type: string }[] = [];
+	filteredEvents: {
+		staffId: any,
+		title?: string,
+		start: any,
+		end?: string,
+		rendering?: string,
+		resourceId: number,
+		placeholderId?: number,
+		color?: string
+	}[] = [];
 
 	constructor(private jobService: JobService, private staffService: StaffService,
 		private taskService: TaskService) {
 	}
 
 	ngOnInit() {
+		this.staffService.getStaff()
+			.then(staff => this.staff = staff);
+
 		const jobPromise = this.jobService.getJobs()
 			.then(jobs => {
 				for (let job of jobs) {
@@ -48,7 +74,8 @@ export class StaffSchedulerComponent implements OnInit {
 							start: job.start,
 							end: job.end,
 							resourceId: job.jobId,
-							rendering: 'background'
+							rendering: 'background',
+							color: this.pickColor(job.jobId)
 						});
 					}
 				}
@@ -61,16 +88,24 @@ export class StaffSchedulerComponent implements OnInit {
 						staffId: event.staffId,
 						start: event.start,
 						end: event.end,
-						title: event.staffId,
+						title: event.name,
 						resourceId: event.jobId,
-						placeholderId: event.staffPlaceholderId
+						placeholderId: event.staffPlaceholderId,
+						color: this.pickColor(event.staffId)
 					});
 				}
 			});
 
 		Promise.all([jobPromise, staffPlaceholderPromise]).then(res => {
+			this.filteredEvents = this.events;
+			this.filteredResources = this.resources;
 			this.createScheduler();
 		});
+	}
+
+	filterStaff() {
+		// Updating filters when selectedStaff changes
+		this.staffScheduler.fullCalendar('rerenderEvents');
 	}
 
 	createScheduler(): any {
@@ -96,10 +131,8 @@ export class StaffSchedulerComponent implements OnInit {
 			drop: (date, jsEvent, ui, resourceId) => {
 				this.handleDrop(date, jsEvent, ui, resourceId);
 			},
-			slotwidth: 100,
+			slotwidth: 75,
 			eventoverlap: false,
-			eventRender: (event, element) => {
-			},
 			dropAccept: this.schedulerAccept,
 			eventReceive: event => {
 				this.handleRecieveEvent(event);
@@ -110,10 +143,15 @@ export class StaffSchedulerComponent implements OnInit {
 			eventDrop: (event, delta, jsEvent, revertFunc, ui, view) => {
 				this.handleEventDrop(event, delta, jsEvent, revertFunc, ui, view);
 			},
+			eventRender: (event, element, view) => {
+				const render = this.handleEventRender(event, element, view);
+				console.log(render);
+				if (!render) { return false; }
+			},
 			resourceRender: (res, label, body) => {
 			},
-			events: this.events,
-			resources: this.resources
+			events: this.filteredEvents,
+			resources: this.filteredResources
 		});
 	}
 
@@ -170,6 +208,28 @@ export class StaffSchedulerComponent implements OnInit {
 		this.staffService.updateStaffPlaceholder(placeholder);
 
 		console.log('eventDrop', placeholder);
+	}
+
+	handleEventRender(event, element, view) {
+		console.log(event);
+		event.color = this.pickColor(event.staffId);
+		if (this.selectedStaff.length === 0) {
+			return true;
+		}
+		if (this.selectedStaff.includes(event.staffId) || event.rendering === 'background') {
+			console.log('fountd', event);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	pickColor(id: number) {
+		// Returns a css color name determined by the id
+		const colors = ['sienna', 'tan', 'gold', 'greenyellow', 'orchid', 'deepskyblue',
+			'darkseagreen', 'lightcoral', 'lightcyan', 'fuchsia', 'mediumvioletred', 'tan',
+			'turquoise'];
+		return colors[colors.length % id];
 	}
 
 }

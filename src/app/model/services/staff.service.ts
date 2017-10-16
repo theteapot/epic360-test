@@ -27,7 +27,7 @@ export class StaffService {
 	}
 
 	getStaffPlaceholders(): Promise<any> {
-		return this.datasource.getData('read/StaffPlaceholder')
+		return this.datasource.getData('read/StaffPlaceholderView')
 		.then( res => {
 			res.forEach(placeholder => {
 				placeholder['start'] = placeholder.start ? moment(placeholder.start) : null;

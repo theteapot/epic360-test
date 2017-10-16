@@ -160,11 +160,12 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 
 				var drag = draggables[i];
 				const event = {
-					title: $(drag).find('h4').text().trim() + ': ' + $(drag).find('.equipment .handle').text().trim(),
+					title: $(drag).find('h4').text().trim(),
 					equipment: [],
 					equipmentId: $(drag).find('.equipment').prevObject.attr('equipmentId'),
 					taskId: $(drag).find('.container').prevObject.attr('taskId'),
-					staffId: $(drag).find('.container').prevObject.attr('staffId')
+					staffId: $(drag).find('.container').prevObject.attr('staffId'),
+					color: this.pickColor(+$(drag).find('.container').prevObject.attr('staffId'))
 				};
 				console.log('drag event', $(drag).find('container'), event);
 				$(drag).data('event', event);
@@ -216,6 +217,14 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 		this.taskService.createTask(task).then((res) => {
 			this.tasks.push(task);
 		});
+	}
+
+	pickColor(id: number) {
+		// Returns a css color name determined by the id
+		const colors = ['sienna', 'tan', 'gold', 'greenyellow', 'orchid', 'deepskyblue',
+			'darkseagreen', 'lightcoral', 'lightcyan', 'fuchsia', 'mediumvioletred', 'tan',
+			'turquoise'];
+		return colors[colors.length % id];
 	}
 
 
