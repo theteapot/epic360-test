@@ -1,0 +1,13 @@
+<p-tabView>
+	<p-tabPanel header="Job Details">
+		<div *ngIf="job">
+			<h5>{{job.title}} : {{job.status}}</h5>
+			<div><b>{{job.type}}</b></div>
+			<small> Start: {{job.start | date:'short'}} - End: {{job.end | date:'short'}}</small>
+			<p>{{job.description}}</p>
+		</div>
+	</p-tabPanel>
+	<p-tabPanel header="Timesheet Details">
+		Content 2
+	</p-tabPanel>
+</p-tabView>

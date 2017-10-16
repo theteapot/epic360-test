@@ -28,6 +28,14 @@ export class JobService {
 			});
 	}
 
+	getJob(jobId: number): Promise<any> {
+		return this.datasource.getData(`read/JobView/jobId/${jobId}`)
+			.then(res => {
+				// Only return the first element of the array since we only expect one
+				return res[0];
+			});
+	}
+
 	getSiteVisits(jobId: number): Promise<any[]> {
 		return this.datasource.getData(`read/SiteVisitView/jobId/${jobId}`);
 	}
