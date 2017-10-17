@@ -115,6 +115,7 @@ export class StaffSchedulerComponent implements OnInit {
 			header: {
 				center: 'timeline, timelineMonth'
 			},
+			displayEventTime: false,
 			defaultView: 'timeline',
 			visibleRange: (currentDate) => {
 				return {
