@@ -7,6 +7,8 @@ import { Staff } from '../../model/interfaces/staff.interface';
 import { Task } from '../../model/interfaces/task.interface';
 import { Equipment } from '../../model/interfaces/equipment.interface';
 import { Job } from '../../model/interfaces/job.interface';
+import { Message } from 'primeng/components/common/api';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
@@ -22,27 +24,26 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 
 	@Input() nestedScheduler: any;
 	scrolled: boolean = false; // Keeps track of whether view has already been scrolled once
-	jsonData = {
-		title: 'my event'
-	};
 
+	msgs: Message[] = [];
 	showTaskDialog: boolean = false;
 	scrollLeftBefore: number; // Keeps track of the current scroll position before an event
 
-	tasks = [
-		{ label: 'Select task', value: null },
-		{ label: 'P3034', value: 1 },
-		{ label: 'P3036', value: 2 }
-	];
+	jobOptions: { label: string, value: any }[] = [];
+	staffOptions: { label: string, value: any }[] = [];
+	selectedJobs = [];
+	selectedStaff = [];
+
 
 	events = [{}];
 
 	resources = [];
 
+	currentView = 'all'; // 'all', 'jobs', 'tasks' - the filters supported by the scheduler
+
 	constructor(private staffService: StaffService, private jobService: JobService,
-		private equipmentService: EquipmentService, private taskService: TaskService) {
-
-
+		private equipmentService: EquipmentService, private taskService: TaskService,
+		private messageService: MessageService) {
 	}
 
 	ngOnInit() {
@@ -70,6 +71,10 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 						end: job.end,
 						resourceId: job.jobId
 					});
+					this.jobOptions.push({
+						label: job.title,
+						value: job
+					});
 				}
 			}
 		});
@@ -78,10 +83,16 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			for (let staff of staffView) {
 				this.resources.push({
 					id: `${staff.jobId}-${staff.staffId}`,
-					title: `${staff.firstName} ${staff.lastName}`,
+					title: staff.staffName,
 					parentId: staff.jobId,
 					type: 'staff'
 				});
+				if (this.staffOptions.filter(s => s.label === staff.staffName).length === 0) {
+					this.staffOptions.push({
+						label: staff.staffName,
+						value: staff
+					});
+				}
 			}
 		});
 
@@ -138,6 +149,9 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 				'DD/MM'
 			],
 			eventResourceEditable: true,
+			resourcesInitiallyExpanded: false,
+			displayEventTime: false,
+			resourceAreaWidth: '300px',
 			editable: true,
 			droppable: true,
 			drop: (date, jsevent, ui, resourecId) => {
@@ -146,7 +160,7 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			slotwidth: 100,
 			eventoverlap: false,
 			eventRender: (event, element) => {
-				console.log('event render', event);
+				console.log('event render', event, element);
 				if (event.type === 'job') {
 					element.addClass('job-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
@@ -164,6 +178,9 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			dropAccept: (draggable) => {
 				return (this.schedulerAccept(draggable));
 			},
+			eventAllow: (dropLocation, draggedEvent) => {
+				return this.handleEventAllow(dropLocation, draggedEvent);
+			},
 			eventReceive: (event) => {
 				this.eventReceive(event);
 			},
@@ -173,10 +190,8 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			eventDrop: (event, delta, revertFunc, ui, view) => {
 				this.eventDrop(event, delta, revertFunc, ui, view);
 			},
-			resourceRender: (res, label, body) => {
-				console.log('resource render 1', res, label, body);
-				$(label.prevObject).attr('type', res.type);
-				console.log('resource render 2', body.prevObject, label);
+			resourceRender: (resourceObj, labelTds, bodyTds) => {
+				this.handleResourceRender(resourceObj, labelTds, bodyTds);
 			},
 			events: this.events,
 			resources: this.resources
@@ -321,7 +336,7 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		// Remove the event that the calendar initially creates
 		console.log('event recieve', event);
 		const eventId = event._id;
-		this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
+		/*this.nestedScheduler.fullCalendar('removeEvents', (filterEvent) => {
 			if (filterEvent._id === eventId) {
 				return true;
 			} else {
@@ -329,7 +344,7 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			}
 		});
 		// Add in our own events
-		this.renderMultipleEvents(event);
+		this.renderMultipleEvents(event);*/
 		// this.createEvent(event);
 		// Update the DB
 		const taskId = event.taskId;
@@ -338,6 +353,17 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		const end = event.end ? event.end.format('YYYY-MM-DD hh:mm:ss') : event.start.add(1, 'hours').format('YYYY-MM-DD hh:mm:ss');
 		console.log('event recieve', start, end);
 		this.taskService.updateTask(taskId, { staffId: staffId, start: start, end: end });
+	}
+
+	handleEventAllow(resource, event) {
+		// Only allow the dropping of events onto the jobs which they belong to
+		console.log('event allow', resource, event);
+		const jobId = resource.resourceId.split('-')[0];
+		if (event.jobId !== jobId) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	renderMultipleEvents(parent) {
@@ -362,12 +388,6 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		}
 	}
 
-	/*createEvent(event) {
-		// Given an event object, add it to the events array, creating multiple entries if required
-		console.log('create event', event);
-		this.taskService.assignStaff();
-	}*/
-
 	updateEvent(event) {
 		// Given an event object, update the corresponding DB table with its information
 		if (event.type === 'job') {
@@ -378,15 +398,25 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 		}
 	}
 
-	/* getResourceText(resource): string {
-		// Gets the appropriate resource text
-		console.log('resourceText', resource);
-		if (resource.type === 'job') {
-			return resource.title;
-		} else if (resource.type === 'staff') {
-			return resource.name;
+	handleResourceRender(resource, label, body) {
+		/*
+		// Filter resources
+		console.log('resource render', resource, label, body);
+		// Break if there is no resourceId element (i.e. add new resource)
+		if (!resource.id) {
+			return;
 		}
-	}*/
+		const jobId = resource.id.split('-')[0];
+		const staffId = resource.id.split('-')[1];
+		if (this.selectedJobs.filter(job => job.jobId === jobId).length === 0) {
+			$(label).css('display', 'none');
+			$(body).css('display', 'none');
+		}*/
+	}
+
+	filter() {
+		this.nestedScheduler.fullCalendar('rerenderEvents');
+	}
 
 	hasher(str: string): string {
 		let hash = 0;

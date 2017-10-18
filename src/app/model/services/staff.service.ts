@@ -56,6 +56,10 @@ export class StaffService {
 			});
 	}
 
+	removeStaffPlaceholder(placeholder: any) {
+		return this.datasource.deleteData(`delete/StaffPlaceholder/staffPlaceholderId/${placeholder.staffPlaceholderId}`);
+	}
+
 	assignStaff(jobId: number, staffId: number) {
 		return this.datasource.postData('create/StaffJobJoin', {jobId: jobId, staffId: staffId})
 			.then( res => {

@@ -1,9 +1,12 @@
-<div class="row">
+<div class="ui-g-row">
 	
-	<div class="col-3">
-		<app-staging-area></app-staging-area>
+	<div class="ui-g-row">
+		<p-panel header="Staging Area" [toggleable]="true">
+			<app-staging-area></app-staging-area>
+		</p-panel>
 	</div>
-	<div class="col-9">
+	
+	<div class="ui-g-row">
 		<p-selectButton [options]="schedulerOptions" [(ngModel)]="schedulerMode"></p-selectButton>
 		<app-staff-scheduler *ngIf="schedulerMode==='staff'"></app-staff-scheduler>
 		<app-task-scheduler  *ngIf="schedulerMode==='tasks'"></app-task-scheduler>

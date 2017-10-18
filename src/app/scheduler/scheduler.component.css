@@ -1,0 +1,40 @@
+/* Styles the header above resources */
+.fc-resource-area.fc-widget-header {
+	background: black;
+	border-color: black !important;
+	color: white;
+}
+
+/* Styles the dividing bar between resources and times */
+.fc-divider {
+	background: black !important;
+	border-color: black !important;
+	border-style: solid !important;
+}
+
+/* Styles borders around day area */
+.fc-widget-header {
+	border-color: black !important;
+}
+
+/* Removes x-axis lines on the calendar */
+.fc-widget-content {
+	border-top-style: none !important;
+	border-bottom-style: none !important;
+}
+
+/* Styles borders around the outside of the resource area */
+.fc-resource-area.fc-widget-content {
+	border-color: black !important;
+	border-style: solid !important;
+	border-left-color: black !important;
+	border-right-color: black !important;
+}
+
+/* Styles timeline events, sets margins to move it away from edges */
+.fc-timeline-event {
+	margin-top: 3px;
+	margin-left: 1px;
+	border-radius: 8px;
+	border-color: black !important;
+}

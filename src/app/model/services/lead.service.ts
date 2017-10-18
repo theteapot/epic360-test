@@ -14,7 +14,7 @@ export class LeadService {
 	}
 
 	getLeads(): Promise<any[]> {
-		return this.datasource.getData('read/Lead');
+		return this.datasource.getData('read/LeadView');
 	}
 
 }

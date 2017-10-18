@@ -27,16 +27,19 @@ export class StaffSchedulerComponent implements OnInit {
 	jobs: any;
 	staff: any;
 	@Input() selectedStaff: any[] = []; // Keeps track of the people who are selected
+	selectedEvent: any; // When we click on an event this is set
+	showEventDialog: boolean = false; // Whether or not we should show the event dialog
+
 
 	resources: { id: number, title: string, type: string }[] = [];
 	events: {
-		staffId: any,
+		staffId?: string,
 		title?: string,
 		start: any,
 		end?: string,
 		rendering?: string,
 		resourceId: number,
-		placeholderId?: number,
+		staffPlaceholderId?: number,
 		color?: string
 	}[] = [];
 	filteredResources: { id: number, title: string, type: string }[] = [];
@@ -47,7 +50,7 @@ export class StaffSchedulerComponent implements OnInit {
 		end?: string,
 		rendering?: string,
 		resourceId: number,
-		placeholderId?: number,
+		staffPlaceholderId?: number,
 		color?: string
 	}[] = [];
 
@@ -69,7 +72,6 @@ export class StaffSchedulerComponent implements OnInit {
 							type: 'job'
 						});
 						this.events.push({
-							staffId: job.jobId,
 							title: job.title,
 							start: job.start,
 							end: job.end,
@@ -90,15 +92,13 @@ export class StaffSchedulerComponent implements OnInit {
 						end: event.end,
 						title: event.name,
 						resourceId: event.jobId,
-						placeholderId: event.staffPlaceholderId,
+						staffPlaceholderId: event.staffPlaceholderId,
 						color: this.pickColor(event.staffId)
 					});
 				}
 			});
 
 		Promise.all([jobPromise, staffPlaceholderPromise]).then(res => {
-			this.filteredEvents = this.events;
-			this.filteredResources = this.resources;
 			this.createScheduler();
 		});
 	}
@@ -124,15 +124,17 @@ export class StaffSchedulerComponent implements OnInit {
 				};
 			},
 			slotLabelFormat: [
-				'DD/MM'
+				'MMM DD'
 			],
+			snapDuration: { hours: 12 },
 			eventResourceEditable: true,
 			editable: true,
 			droppable: true,
 			drop: (date, jsEvent, ui, resourceId) => {
 				this.handleDrop(date, jsEvent, ui, resourceId);
 			},
-			slotwidth: 75,
+			slotwidth: '25px',
+			resourceAreaWidth: '200px',
 			eventoverlap: false,
 			dropAccept: this.schedulerAccept,
 			eventReceive: event => {
@@ -149,20 +151,28 @@ export class StaffSchedulerComponent implements OnInit {
 				console.log(render);
 				if (!render) { return false; }
 			},
+			eventClick: (event, jsEvent, view) => {
+				this.handleEventClick(event, jsEvent, view);
+			},
+			eventDestroy: (event, element, view) => {
+				console.log('removing from DOM', event, element, view);
+			},
 			resourceRender: (res, label, body) => {
 			},
-			events: this.filteredEvents,
-			resources: this.filteredResources
+			resourceLabelText: 'Jobs',
+			events: this.events,
+			resources: this.resources
 		});
 	}
 
 	handleDrop(date, jsEvent, ui, resourceId) {
-		console.log('jobId', resourceId, 'staffId', $(jsEvent.target).attr('staffId'));
+		console.log('eventDrop', 'jobId', resourceId, 'staffId', $(jsEvent.target).attr('staffId'));
 	}
 
 	schedulerAccept(draggable) {
 		// Only accept staff draggables
 		if ($(draggable).attr('type') === 'staff') {
+			console.log('accepting', draggable);
 			return true;
 		} else {
 			return false;
@@ -178,17 +188,25 @@ export class StaffSchedulerComponent implements OnInit {
 			end: event.end ? event.end : null
 		};
 		this.staffService.createStaffPlaceholder(placeholder)
+			// Update the values
 			.then(res => {
-				event.placeholderId = res.insertId;
+				event.staffPlaceholderId = res.insertId;
 				this.staffScheduler.fullCalendar('updateEvent', event);
 			});
-		this.staffService.assignStaff(placeholder.jobId, placeholder.staffId);
+		// this.staffService.assignStaff(placeholder.jobId, placeholder.staffId);
+	}
+
+	handleEventClick(event, jsEvent, view) {
+		console.log('displaying event dialog', event);
+		// Displays dialog over the event
+		this.selectedEvent = event;
+		this.showEventDialog = true;
 	}
 
 	handleEventResize(event, delta, revertFunc, ui, view) {
 		// On event change, update the db
 		const placeholder = {
-			staffPlaceholderId: event.placeholderId,
+			staffPlaceholderId: event.staffPlaceholderId,
 			staffId: event.staffId,
 			jobId: event.resourceId,
 			start: event.start,
@@ -200,7 +218,7 @@ export class StaffSchedulerComponent implements OnInit {
 
 	handleEventDrop(event, delta, revertFunc, jsEvent, ui, view) {
 		const placeholder = {
-			staffPlaceholderId: event.placeholderId,
+			staffPlaceholderId: event.staffPlaceholderId,
 			staffId: event.staffId,
 			jobId: event.resourceId,
 			start: event.start,
@@ -212,8 +230,8 @@ export class StaffSchedulerComponent implements OnInit {
 	}
 
 	handleEventRender(event, element, view) {
-		console.log(event);
 		event.color = this.pickColor(event.staffId);
+		console.log('rendering', event);
 		if (this.selectedStaff.length === 0) {
 			return true;
 		}
@@ -225,12 +243,30 @@ export class StaffSchedulerComponent implements OnInit {
 		}
 	}
 
+	removeEvent(event) {
+		// Removes that staff placeholder element
+		this.staffService.removeStaffPlaceholder(event)
+			.then(res => {
+				console.log('removing event', event._id);
+				this.staffScheduler.fullCalendar('removeEvents', eventObj => {
+					console.log('removing events check', eventObj, event);
+					if (eventObj._id === event._id) {
+						return true;
+					} else {
+						return false;
+					}
+				});
+			});
+		this.showEventDialog = false;
+	}
+
+
 	pickColor(id: number) {
 		// Returns a css color name determined by the id
 		const colors = ['sienna', 'tan', 'gold', 'greenyellow', 'orchid', 'deepskyblue',
 			'darkseagreen', 'lightcoral', 'lightcyan', 'fuchsia', 'mediumvioletred', 'tan',
 			'turquoise'];
-		return colors[colors.length % id];
+		return colors[id % colors.length];
 	}
 
 }

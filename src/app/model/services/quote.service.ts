@@ -19,11 +19,15 @@ export class QuoteService {
 		return this.datasource.getData('read/Quote');
 	}
 
+	createQuote(quote: { leadId: number, jobId: number }) {
+		return this.datasource.postData(`create/Quote`, quote);
+	}
+
 	getPdf(quoteId: number): Promise<any> {
 		return this.datasource.getData(`pdf/${quoteId}`, true)
 			.then(res => {
 				console.log('get pdf', res);
-				return new Blob([res.blob()], {type: 'application/pdf'});
+				return new Blob([res.blob()], { type: 'application/pdf' });
 			});
 	}
 

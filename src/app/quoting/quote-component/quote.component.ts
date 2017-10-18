@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { QuoteService } from '../../model/services/quote.service';
+import { LeadService } from '../../model/services/lead.service';
 
 @Component({
 	selector: 'app-quote-component',
@@ -13,6 +14,8 @@ export class QuoteComponent implements OnInit {
 
 	quoteId: number;
 	quotes: any;
+	leads: any;
+	selectedLead: any;
 	quote: Observable<any>;
 	selectedQuote: any; // The quote selected on the sidebar
 	quoteRows: any[]; // All of the rows for the selected quote
@@ -22,8 +25,17 @@ export class QuoteComponent implements OnInit {
 
 	constructor(
 		private route: ActivatedRoute,
-		private quoteService: QuoteService
+		private quoteService: QuoteService,
+		private leadService: LeadService
 	) {
+		this.leadService.getLeads().then(leads => {
+			this.leads = leads.map(lead => {
+				return {
+					label: lead.leadName,
+					value: lead
+				};
+			});
+		});
 		this.quoteService.getQuotes().then(quotes => {
 			this.quotes = quotes.map(quote => {
 				return {
@@ -39,7 +51,7 @@ export class QuoteComponent implements OnInit {
 	}
 
 	downloadPdf() {
-		this.quoteService.getPdf(this.selectedQuote.quoteId)
+		this.quoteService.getPdf(this.selectedLead.quoteId)
 			.then(pdf => {
 				console.log('pdf string', pdf);
 				const fileUrl = URL.createObjectURL(pdf);
@@ -47,10 +59,21 @@ export class QuoteComponent implements OnInit {
 			});
 	}
 
-	selectQuote(quote: any) {
-		this.quoteService.getQuoteRows(quote.quoteId).then(quoteRows => this.quoteRows = quoteRows);
-		this.selectedQuote = quote;
-		console.log('selected quote', quote);
+	selectLead(lead: any) {
+		this.quoteRows = null;
+		if (lead.quoteId) {
+			this.quoteService.getQuoteRows(lead.quoteId).then(quoteRows => this.quoteRows = quoteRows);
+		}
+		this.selectedLead = lead;
+	}
+
+	createQuote() {
+		// Creates a quote element in the database, sends an email to the lead, displays the quote table
+		this.quoteService.createQuote({leadId: this.selectedLead.leadId, jobId: this.selectedLead.jobId})
+			.then(res => {
+				this.selectedLead.quoteId = res.insertId;
+				this.quoteRows = [];
+			});
 	}
 
 
@@ -67,7 +90,7 @@ export class QuoteComponent implements OnInit {
 			description: '',
 			amount: '',
 			cost: '',
-			quoteId: this.selectedQuote.quoteId,
+			quoteId: this.selectedLead.quoteId,
 		};
 		this.displayDialog = true;
 	}
@@ -99,18 +122,5 @@ export class QuoteComponent implements OnInit {
 		this.selectedRow = null;
 		this.displayDialog = false;
 	}
-	/*
-	
-		cloneCar(c: Car): Car {
-			let car = new PrimeCar();
-			for (let prop in c) {
-				car[prop] = c[prop];
-			}
-			return car;
-		}
-	
-		findSelectedCarIndex(): number {
-			return this.cars.indexOf(this.selectedCar);
-		}*/
 
 }

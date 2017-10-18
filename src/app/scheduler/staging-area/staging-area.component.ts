@@ -157,14 +157,14 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			// Set the properties (if they are not set already)
 			const draggables = $(selector);
 			for (let i = 0; i < draggables.length; i++) {
-
-				var drag = draggables[i];
+				const drag = draggables[i];
 				const event = {
-					title: $(drag).find('h4').text().trim(),
-					equipment: [],
+					title: $(drag).find('.equipment .handle').text(),
+					equipment: $(drag).find('.equipment .handle').text(),
 					equipmentId: $(drag).find('.equipment').prevObject.attr('equipmentId'),
-					taskId: $(drag).find('.container').prevObject.attr('taskId'),
-					staffId: $(drag).find('.container').prevObject.attr('staffId'),
+					taskId: $(drag).find('.container').attr('taskId'),
+					jobId: $(drag).find('.container').attr('jobId'),
+					staffId: +$(drag).find('.container').prevObject.attr('staffId'),
 					color: this.pickColor(+$(drag).find('.container').prevObject.attr('staffId'))
 				};
 				console.log('drag event', $(drag).find('container'), event);

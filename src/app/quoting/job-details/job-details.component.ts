@@ -8,14 +8,14 @@ import { JobService } from '../../model/services/job.service';
 })
 export class JobDetailsComponent implements OnChanges {
 
-	@Input() selectedQuote: any;
+	@Input() selectedLead: any;
 	job: any = null;
 
 	constructor(private jobService: JobService) { }
 
 	ngOnChanges() {
-		if (this.selectedQuote) {
-			this.jobService.getJob(this.selectedQuote.jobId).then(job => this.job = job);
+		if (this.selectedLead) {
+			this.jobService.getJob(this.selectedLead.jobId).then(job => this.job = job);
 		}
 	}
 

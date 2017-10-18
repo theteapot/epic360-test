@@ -1,6 +1,9 @@
 <div class="ui-g" style="width:250px;margin-bottom:10px" *ngIf="staff">
 	<p-checkbox *ngFor="let s of staff" [value]="s.staffId" [(ngModel)]="selectedStaff" [label]="s.name" (click)=filterStaff()></p-checkbox>
 </div>
-{{selectedStaff | json}}
 
 <div id="staff-scheduler"></div>
+
+<p-dialog [(visible)]="showEventDialog">
+	<button pButton (click)="removeEvent(selectedEvent)" label="Remove"></button>
+</p-dialog>
