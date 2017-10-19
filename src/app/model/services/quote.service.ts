@@ -16,11 +16,19 @@ export class QuoteService {
 	}
 
 	getQuotes(): Promise<any> {
-		return this.datasource.getData('read/Quote');
+		return this.datasource.getData('read/QuoteView');
 	}
 
-	createQuote(quote: { leadId: number, jobId: number }) {
+	getQuote(column: string, parameter: any) {
+		return this.datasource.getData(`read/QuoteView/${column}/${parameter}`);
+	}
+
+	createQuote(quote: { leadId?: number, jobId?: number }) {
 		return this.datasource.postData(`create/Quote`, quote);
+	}
+
+	updateQuote(quoteId: number, quote: any) {
+		return this.datasource.putData(`update/Quote/quoteId/${quoteId}`, quote);
 	}
 
 	getPdf(quoteId: number): Promise<any> {

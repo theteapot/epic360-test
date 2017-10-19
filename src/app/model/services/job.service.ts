@@ -28,8 +28,8 @@ export class JobService {
 			});
 	}
 
-	getJob(jobId: number): Promise<any> {
-		return this.datasource.getData(`read/JobView/jobId/${jobId}`)
+	getJob(column: string, parameter: string): Promise<any> {
+		return this.datasource.getData(`read/JobView/${column}/${parameter}`)
 			.then(res => {
 				// Only return the first element of the array since we only expect one
 				return res[0];

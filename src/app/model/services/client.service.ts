@@ -34,4 +34,8 @@ export class ClientService {
 	getOffices(): Promise<any[]> {
 		return this.datasource.getData('read/ClientOffice');
 	}
+
+	emailClient(clientId: number, body: { subject: string, text: string }) {
+		return this.datasource.postData(`email/Client/${clientId}`, body);
+	}
 }

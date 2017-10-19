@@ -1,0 +1,33 @@
+<p-panel class="ui-g-4" header="Current Leads">
+	<p-listbox *ngIf="currentLeads" [options]="currentLeads" [(ngModel)]="selectedLead">
+		<ng-template let-lead pTemplate="item">
+			<div *ngIf="!lead.value.quoteDescription" (click)="selectLead(lead.value)">
+				<b>{{lead.value.leadName}}</b>
+				<em>{{lead.value.action}}</em>
+				<p>{{lead.value.leadDescription}}</p>
+			</div>
+		</ng-template>
+	</p-listbox>
+</p-panel>
+<p-panel class="ui-g-4" header="Current Quotes">
+	<p-listbox *ngIf="currentQuotes" [options]="currentQuotes" [(ngModel)]="selectedQuote">
+		<ng-template let-quote pTemplate="item">
+			<div *ngIf="!quote.value.jobDescription && quote.value.quoteDescription" (click)="selectQuote(quote.value)">
+				<b>QuoteID: {{quote.value.quoteId}}</b>
+				<p>Price: {{quote.value.price | currency:'NZD'}}</p>
+			</div>
+		</ng-template>
+	</p-listbox>
+</p-panel>
+<p-panel class="ui-g-4" header="Current Jobs">
+	<p-listbox *ngIf="currentJobs" [options]="currentJobs" [(ngModel)]="selectedJob">
+		<ng-template let-job pTemplate="item">
+			<div *ngIf="job.value.jobDescription" (click)="selectJob(job.value)">
+				<b>{{job.value.title}}</b>
+				<em>ID: {{job.value.jobId}}</em>
+				<p>{{job.value.description}}</p>
+			</div>
+		</ng-template>
+	</p-listbox>
+</p-panel>
+

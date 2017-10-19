@@ -9,7 +9,6 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { QuotingModule } from './quoting/quoting.module';
 import { QuoteRoutingModule } from './quoting/quote-routing.module';
-import { MessageService } from 'primeng/components/common/messageservice';
 
 @NgModule({
 	declarations: [
@@ -24,7 +23,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
 		TabMenuModule,
 		BrowserModule
 	],
-	providers: [MessageService],
+	providers: [],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

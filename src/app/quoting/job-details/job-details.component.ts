@@ -15,7 +15,7 @@ export class JobDetailsComponent implements OnChanges {
 
 	ngOnChanges() {
 		if (this.selectedLead) {
-			this.jobService.getJob(this.selectedLead.jobId).then(job => this.job = job);
+			this.jobService.getJob('jobId', this.selectedLead.jobId).then(job => this.job = job);
 		}
 	}
 

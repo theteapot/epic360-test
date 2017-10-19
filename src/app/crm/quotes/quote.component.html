@@ -1,0 +1,61 @@
+<p-growl [(value)]="msgs"></p-growl>
+
+<div class="ui-g-9">
+	<div *ngIf="quoteData">
+
+		<div *ngIf="quoteData.quoteStage">
+			<p-dataTable [value]="quoteRows" selectionMode="single" [(selection)]="selectedRow" (onRowSelect)="onRowSelect($event)" [paginator]="true" rows="15" [responsive]="true">
+				<p-column field="description" header="Description"></p-column>
+				<p-column field="amount" header="Amount"></p-column>
+				<p-column field="cost" header="Cost"></p-column>
+				<p-footer><div class="ui-helper-clearfix" style="width:100%">
+					<button type="button" pButton style="float:left" (click)="showDialogToAdd()" label="Add"></button>
+					<button type="button" pButton style="float:left" (click)="downloadPdf()" label="PDF"></button>
+				</div></p-footer>
+			</p-dataTable>
+			<p>{{quoteData.quoteDescription}}</p>
+		</div>
+		<div *ngIf="!quoteForm.quoteStage">
+			<form [formGroup]="quoteForm">
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-4"><label for="description">Description</label></div>
+					<div class="ui-grid-col-8"><input pInputText id="description" formControlName="description" /></div>
+				</div>
+			</form>
+		</div>
+		<button type="button" pButton [disabled]="!quoteForm.valid" (click)="createQuote()" label="Create Quote"></button>
+	</div>
+	<div *ngIf="!quoteData">
+		<form [formGroup]="quoteForm">
+			<div class="ui-grid-row">
+				<div class="ui-grid-col-4"><label for="description">Description</label></div>
+				<div class="ui-grid-col-8"><input pInputText id="description" formControlName="description" /></div>
+			</div>
+		</form>
+		<button type="button" pButton [disabled]="!quoteForm.valid" (click)="createQuote()" label="Create Quote"></button>
+	</div>
+</div>
+
+
+<p-dialog header="Quote Element" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true">
+	<div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="selectedRow">
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="description">Description</label></div>
+			<div class="ui-grid-col-8"><input pInputText id="description" [(ngModel)]="selectedRow.description" /></div>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="amount">Amount</label></div>
+			<div class="ui-grid-col-8"><input pInputText id="amount" [(ngModel)]="selectedRow.amount" /></div>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="cost">Cost</label></div>
+			<div class="ui-grid-col-8"><input pInputText id="cost" [(ngModel)]="selectedRow.cost" /></div>
+		</div>
+	</div>
+	<p-footer>
+		<div class="ui-dialog-buttonpane ui-helper-clearfix">
+			<button type="button" pButton (click)="delete()" label="Delete"></button>
+			<button type="button" pButton (click)="save()" label="Save"></button>
+		</div>
+	</p-footer>
+</p-dialog>

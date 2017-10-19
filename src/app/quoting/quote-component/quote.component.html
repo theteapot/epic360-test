@@ -1,13 +1,6 @@
+<p-growl [(value)]="msgs"></p-growl>
+
 <div class="ui-g-3" *ngIf="quotes">	
-	<p-listbox [options]="quotes" [(ngModel)]="selectedQuote">
-		<ng-template let-quote pTemplate="item">
-			<div (click)="selectQuote(quote.value)">
-				<b>Q:{{quote.value.quoteId}}</b>
-				<em>L:{{quote.value.leadId}}</em>
-				<p>{{quote.value.description}}</p>
-			</div>
-		</ng-template>
-	</p-listbox>
 	<p-listbox *ngIf="leads" [options]="leads" [(ngModel)]="selectedLead">
 		<ng-template let-lead pTemplate="item">
 			<div (click)="selectLead(lead.value)">

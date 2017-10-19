@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
 import { QuoteService } from '../../model/services/quote.service';
 import { LeadService } from '../../model/services/lead.service';
 import { ClientService } from '../../model/services/client.service';
@@ -14,7 +16,9 @@ import { MessageService } from 'primeng/components/common/messageservice';
 	templateUrl: './quote.component.html',
 	styleUrls: ['./quote.component.css']
 })
-export class QuoteComponent implements OnInit {
+export class QuoteComponent implements OnInit, OnChanges {
+
+	@Input() quoteData: any;
 
 	msgs: Message[] = [];
 
@@ -27,6 +31,8 @@ export class QuoteComponent implements OnInit {
 	selectedQuote: any; // The quote selected on the sidebar
 	quoteRows: any[]; // All of the rows for the selected quote
 
+	quoteForm: FormGroup;
+
 	selectedRow: any; // The row the user clicks on in the table
 	displayDialog: boolean;
 	newEntry: boolean; // Whether the user is creating or updating a row
@@ -36,7 +42,8 @@ export class QuoteComponent implements OnInit {
 		private quoteService: QuoteService,
 		private leadService: LeadService,
 		private clientService: ClientService,
-		private messageService: MessageService
+		private messageService: MessageService,
+		private formBuilder: FormBuilder
 	) {
 		this.leadService.getLeads().then(leads => {
 			this.leads = leads.map(lead => {
@@ -54,43 +61,37 @@ export class QuoteComponent implements OnInit {
 				};
 			});
 		});
+		this.quoteForm = this.formBuilder.group({
+			description: ['', Validators.required]
+		});
 	}
 
 	ngOnInit() {
 
 	}
 
-	downloadPdf() {
-		this.messageService.add({
-			severity: 'info',
-			summary: 'Creating PDF',
-			detail: 'The PDF will open shortly, please be patient'
-		});
-
-		this.quoteService.getPdf(this.selectedLead.quoteId)
-			.then(pdf => {
-				console.log('pdf string', pdf);
-				const fileUrl = URL.createObjectURL(pdf);
-				window.open(fileUrl);
+	ngOnChanges() {
+		if (this.quoteData) {
+			console.log('quotedata', this.quoteData);
+			this.quoteService.getQuoteRows(this.quoteData.quoteId).then(quoteRows => {
+				this.quoteRows = quoteRows;
 			});
-	}
-
-	selectLead(lead: any) {
-		this.quoteRows = null;
-		if (lead.quoteId) {
-			this.quoteService.getQuoteRows(lead.quoteId).then(quoteRows => this.quoteRows = quoteRows);
 		}
-		this.selectedLead = lead;
 	}
 
 	createQuote() {
-		// Creates a quote element in the database
+		// Changes the flags on the lead and quote, then emit the new event
+		if (this.quoteData) {
+			this.quoteService.updateQuote(this.quoteData.quoteId, { quoteStage: 1, description: this.quoteForm.value.description });
+			this.leadService.updateLead(this.quoteData.leadId, { leadStage: 0 });
+		}
+
 		this.quoteService.createQuote({ leadId: this.selectedLead.leadId, jobId: this.selectedLead.jobId })
 			.then(res => {
 				this.selectedLead.quoteId = res.insertId;
 				this.quoteRows = [];
 			});
-		// Sends an email to the client
+		// Sends an email to the client if there is a client associated
 		this.clientService.emailClient(this.selectedLead.clientId, {
 			subject: 'Quote Created - Epic360',
 			text: 'We have created your quote, you should hear from us shortly.'
@@ -118,7 +119,7 @@ export class QuoteComponent implements OnInit {
 			description: '',
 			amount: '',
 			cost: '',
-			quoteId: this.selectedLead.quoteId,
+			quoteId: this.quoteData.quoteId,
 		};
 		this.displayDialog = true;
 	}

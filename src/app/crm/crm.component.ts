@@ -5,4 +5,21 @@ import { Component } from '@angular/core';
 	templateUrl: './crm.component.html',
 	styleUrls: ['./crm.component.css']
 })
-export class CrmComponent { }
+export class CrmComponent {
+	constructor() { }
+	quoteData: any;
+	leadData: any;
+	jobData: any;
+
+	handleQuoteData(data) {
+		this.quoteData = data;
+	}
+
+	handleLeadData(data) {
+		this.leadData = data;
+	}
+
+	handleJobData(data) {
+		this.jobData = data;
+	}
+}

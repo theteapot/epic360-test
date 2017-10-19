@@ -1,6 +1,10 @@
 <p-panel class="ui-grid ui-grid-responsive ui-fluid" header="Lead">
 	<form [formGroup]="leadForm">
 		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="client">Client</label></div>
+			<p-dropdown [options]="clients" placeholder="Select Client" formControlName="clientId"></p-dropdown>	
+		</div>
+		<div class="ui-grid-row">
 			<div class="ui-grid-col-4"><label for="leadName">Name</label></div>
 			<input class="ui-grid-col-8" type="text" id="leadName" pInputText formControlName="name">
 		</div>

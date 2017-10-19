@@ -4,18 +4,20 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
 	ListboxModule, DataTableModule, SharedModule, DialogModule, InputTextModule,
-	ButtonModule, TabViewModule
+	ButtonModule, TabViewModule, GrowlModule
 } from 'primeng/primeng';
 
 import { QuoteComponent } from './quote-component/quote.component';
 import { QuoteModuleComponent } from './quote-module.component';
 import { QuoteService } from '../model/services/quote.service';
 import { JobDetailsComponent } from './job-details/job-details.component';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		ListboxModule,
+		GrowlModule,
 		InputTextModule,
 		ButtonModule,
 		DataTableModule,
@@ -31,7 +33,8 @@ import { JobDetailsComponent } from './job-details/job-details.component';
 		JobDetailsComponent
 	],
 	providers: [
-		QuoteService
+		QuoteService,
+		MessageService
 	],
 	exports: [
 		QuoteModuleComponent

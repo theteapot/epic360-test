@@ -18,6 +18,7 @@ export class JobComponent implements OnInit {
 	followUpForm: FormGroup;
 	siteVisitForm: FormGroup;
 
+	@Input() jobData: any;
 	@Input() client;
 	selectedJob: Job;
 
