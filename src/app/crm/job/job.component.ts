@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { JobService } from '../../model/services/job.service';
 import { StaffService } from '../../model/services/staff.service';
@@ -12,7 +12,7 @@ import { Staff } from '../../model/interfaces/staff.interface';
 	templateUrl: './job.component.html',
 	styleUrls: ['./job.component.css']
 })
-export class JobComponent implements OnInit {
+export class JobComponent implements OnInit, OnChanges {
 
 	jobForm: FormGroup;
 	followUpForm: FormGroup;
@@ -20,6 +20,8 @@ export class JobComponent implements OnInit {
 
 	@Input() jobData: any;
 	@Input() client;
+
+	@Output() refreshJobs = new EventEmitter();
 	selectedJob: Job;
 
 	jobTypes: JobType[];
@@ -65,6 +67,18 @@ export class JobComponent implements OnInit {
 
 	}
 
+	ngOnChanges() {
+		console.log('jbo data', this.jobData);
+		if (this.jobData) {
+			this.jobForm.patchValue({
+				title: this.jobData.value.title,
+				description: this.jobData.value.description,
+				start: this.jobData.value.start,
+				end: this.jobData.value.end
+			});
+		}
+	}
+
 	ngOnInit() {
 		this.jobService.getJobTypes().then(jobTypes => this.jobTypes = jobTypes);
 		this.staffService.getStaff().then(staff => this.staff = staff);
@@ -88,15 +102,6 @@ export class JobComponent implements OnInit {
 		this.jobService.createJob(this.jobForm.value);
 	}
 
-	createFollowUp() {
-		this.followUpForm.value.staffId = this.followUpForm.value.staff.staffId;
-		delete this.followUpForm.value.staff;
-
-		this.jobService.createFollowUp(this.selectedJob.jobId, this.followUpForm.value)
-			.then(res => {
-				this.followUps.push(this.followUpForm.value);
-			});
-	}
 
 	createSiteVisit() {
 		this.siteVisitForm.value.staffId = this.siteVisitForm.value.staff.staffId;
@@ -110,6 +115,16 @@ export class JobComponent implements OnInit {
 			.then(res => {
 				this.followUps.push(this.siteVisitForm.value);
 			});
+	}
+
+	updateJob() {
+		this.jobForm.value.start = this.jobForm.value.dateRange[0];
+		this.jobForm.value.end = this.jobForm.value.dateRange[1];
+		delete this.jobForm.value.dateRange;
+
+		this.jobService.updateJob(this.jobData.value.jobId, this.jobForm.value).then( () => {
+			this.refreshJobs.emit();
+		});
 	}
 
 }

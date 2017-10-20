@@ -14,6 +14,7 @@ import { JobComponent } from '../crm/job/job.component';
 import { CrmComponent } from './crm.component';
 import { QuoteComponent } from './quotes/quote.component';
 import { CurrentItemsComponent } from './current-items/current-items.component';
+import { LeadSchedulerComponent } from './scheduler/lead-scheduler.component';
 
 @NgModule({
 	declarations: [
@@ -23,6 +24,7 @@ import { CurrentItemsComponent } from './current-items/current-items.component';
 		LeadsComponent,
 		QuoteComponent,
 		CrmComponent,
+		LeadSchedulerComponent,
 		CurrentItemsComponent
 	],
 	imports: [

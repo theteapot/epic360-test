@@ -1,12 +1,17 @@
 <p-tabView class="ui-g-5">
 	<p-tabPanel header="New Lead">
-		<app-leads [(leadData)]="leadData" (eventCreateLead)="handle"></app-leads>			
+		<app-leads [(leadData)]="leadData" (eventUpdateLead)="handleLeadUpdate($event)" (eventCreateLead)="handleLeadCreate($event)" (eventCreateFollowUp)="refreshScheduler()" [staff]="staff"></app-leads>
 	</p-tabPanel>
 	<p-tabPanel header="New Quote">
-		<app-quote-component [(quoteData)]="quoteData"></app-quote-component>
+		<app-quote-component [(quoteData)]="quoteData" (quoteCreated)="handleQuoteCreated($event)" (quoteToJobEvent)="handleQuoteToJob($event)"></app-quote-component>
 	</p-tabPanel>
 	<p-tabPanel header="New Job">
-		<app-job [(jobData)]="jobData"></app-job>
+		<app-job [(jobData)]="jobData" (refreshJobs)="refreshJobs()"></app-job>
 	</p-tabPanel>
 </p-tabView>
-<app-current-items class="ui-g-7" (quoteData)="handleQuoteData($event)" (leadData)="handleLeadData($event)" (jobData)="handleJobData($event)"></app-current-items>
+<div class="ui-g-7">
+		<app-lead-scheduler class="ui-g"></app-lead-scheduler>		
+		<app-current-items class="ui-g" (quoteData)="handleQuoteData($event)" (leadData)="handleLeadData($event)" (jobData)="handleJobData($event)"
+		[(currentQuotes)]="currentQuotes" [(currentJobs)]="currentJobs" [(currentLeads)]="currentLeads"></app-current-items>
+</div>
+

@@ -85,7 +85,7 @@ export class QuoteComponent implements OnInit {
 
 	createQuote() {
 		// Creates a quote element in the database
-		this.quoteService.createQuote({ leadId: this.selectedLead.leadId, jobId: this.selectedLead.jobId })
+		this.quoteService.createQuote({ leadId: this.selectedLead.leadId })
 			.then(res => {
 				this.selectedLead.quoteId = res.insertId;
 				this.quoteRows = [];

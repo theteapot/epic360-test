@@ -2,7 +2,7 @@
 	<form [formGroup]="leadForm">
 		<div class="ui-grid-row">
 			<div class="ui-grid-col-4"><label for="client">Client</label></div>
-			<p-dropdown [options]="clients" placeholder="Select Client" formControlName="clientId"></p-dropdown>	
+			<p-dropdown [options]="clients" placeholder="Select Client" formControlName="clientId"></p-dropdown>
 		</div>
 		<div class="ui-grid-row">
 			<div class="ui-grid-col-4"><label for="leadName">Name</label></div>
@@ -14,7 +14,7 @@
 		</div>
 		<div class="ui-grid-row">
 			<div class="ui-grid-col-4"><label for="leadName">Type</label></div>
-			<p-dropdown [options]="jobTypes" if="leadType" placeholder="Select Type" formControlName="type"></p-dropdown>	
+			<p-dropdown [options]="jobTypes" if="leadType" placeholder="Select Type" formControlName="type"></p-dropdown>
 		</div>
 		<div class="ui-grid-row" *ngIf="leadForm.value.type==='builder'">
 			<div class="ui-grid-col-4"><label for="leadName">Builder Type</label></div>
@@ -24,6 +24,27 @@
 			<div class="ui-grid-col-4"><label for="leadDescription">Description</label></div>
 			<textarea pInputTextarea id="leadDescription" formControlName="description"></textarea>
 		</div>
-		<button pButton type="button" (click)="createLead()" label="Create Lead"></button>
+		<button *ngIf="!leadData" pButton type="button" (click)="createLead()" label="Create Lead"></button>
+		<button *ngIf="leadData" pButton type="button" (click)="updateLead()" label="Update Lead"></button>
+	</form>
+</p-panel>
+
+<p-panel header="Follow Up">
+	<form [formGroup]="followUpForm">
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="description">Description</label></div>
+			<textarea pInputTextarea formControlName="description"></textarea>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="date">Date</label></div>
+			<p-calendar readonlyInput="true" [showIcon]="true" formControlName="date"></p-calendar>
+		</div>
+		<div class="ui-grid-row">
+			<div class="ui-grid-col-4"><label for="staff">Staff</label></div>
+			<p-dropdown [options]="staff" formControlName="staff" placehold></p-dropdown>
+		</div>
+		<div class="ui-grid-row">
+			<button pButton type="button" (click)="createFollowUp()" label="Create Follow-Up"></button>
+		</div>
 	</form>
 </p-panel>

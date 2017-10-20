@@ -8,14 +8,14 @@ import { CrmModule } from './crm/crm.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { QuotingModule } from './quoting/quoting.module';
-import { QuoteRoutingModule } from './quoting/quote-routing.module';
+// import { QuoteRoutingModule } from './quoting/quote-routing.module';
 
 @NgModule({
 	declarations: [
 		AppComponent,
 	],
 	imports: [
-		QuoteRoutingModule,
+		//  QuoteRoutingModule,
 		AppRoutingModule,
 		CrmModule,
 		SchedulerModule,

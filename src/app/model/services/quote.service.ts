@@ -23,7 +23,7 @@ export class QuoteService {
 		return this.datasource.getData(`read/QuoteView/${column}/${parameter}`);
 	}
 
-	createQuote(quote: { leadId?: number, jobId?: number }) {
+	createQuote(quote: any) {
 		return this.datasource.postData(`create/Quote`, quote);
 	}
 

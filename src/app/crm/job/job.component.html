@@ -12,10 +12,8 @@
 		</ng-template>
 	</p-dataList>
 
-
-	<button pButton type="button" (click)="showJobForm =! showJobForm" label="Create Job"></button>		
-	<p-panel *ngIf="showJobForm" header="Create Job" class="ui-grid ui-grid-responsive ui-fluid">
-		<form [formGroup]="jobForm" *ngIf="showJobForm" >
+	<p-panel header="Create Job" class="ui-grid ui-grid-responsive ui-fluid">
+		<form [formGroup]="jobForm">
 			<div class="ui-grid-row">						
 				<input pInput type="text" formControlName="title">
 			</div>
@@ -52,25 +50,8 @@
 				<div class="ui-grid-col-4"><label for="jobRange">Expected Timeframe</label></div>					
 				<p-calendar selectionMode="range" id="jobRange" readonlyInput="true" formControlName="dateRange"></p-calendar>
 			</div>
-			<button pButton type="button" (click)="createJob()" label="Create Job"></button>	
-		</form>
-	</p-panel>
-	
-
-	<p-panel header="Follow Up">
-		<form [formGroup]="followUpForm" *ngIf="selectedJob">
-			<div class="ui-grid-row">
-				<textarea pInputTextarea formControlName="description"></textarea>			
-			</div>
-			<div class="ui-grid-row">
-				<p-calendar readonlyInput="true" [showIcon]="true" formControlName="date"></p-calendar>
-			</div>
-			<div class="ui-grid-row">
-				<p-dropdown [options]="staff" formControlName="staff" placehold></p-dropdown>
-			</div>
-			<div class="ui-grid-row">
-				<button pButton type="button" (click)="createFollowUp()" label="Create Follow-Up"></button>	
-			</div>
+			<button *ngIf="jobForm.dirty" pButton type="button" (click)="updateJob()" label="Update Job"></button>
+			<button *ngIf="jobForm.pristine" pButton type="button" (click)="createJob()" label="Create Job"></button>	
 		</form>
 	</p-panel>
 	

@@ -3,7 +3,7 @@
 <div class="ui-g-9">
 	<div *ngIf="quoteData">
 
-		<div *ngIf="quoteData.quoteStage">
+		<div *ngIf="quoteData">
 			<p-dataTable [value]="quoteRows" selectionMode="single" [(selection)]="selectedRow" (onRowSelect)="onRowSelect($event)" [paginator]="true" rows="15" [responsive]="true">
 				<p-column field="description" header="Description"></p-column>
 				<p-column field="amount" header="Amount"></p-column>
@@ -24,6 +24,7 @@
 			</form>
 		</div>
 		<button type="button" pButton [disabled]="!quoteForm.valid" (click)="createQuote()" label="Create Quote"></button>
+		<button *ngIf="quoteData.quoteStage" type="button" pButton [disabled]="!quoteRows" (click)="quoteToJob(quoteRows)" label="Turn Into Job"></button>
 	</div>
 	<div *ngIf="!quoteData">
 		<form [formGroup]="quoteForm">

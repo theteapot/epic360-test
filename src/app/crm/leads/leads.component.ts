@@ -13,8 +13,11 @@ import { QuoteService } from '../../model/services/quote.service';
 export class LeadsComponent implements OnInit, OnChanges {
 
 	@Input() leadData: any;
+	@Input() staff: any;
 
+	@Output() eventUpdateLead = new EventEmitter();
 	@Output() eventCreateLead = new EventEmitter();
+	@Output() eventCreateFollowUp = new EventEmitter();
 
 	jobActions = [
 		{ label: 'Tender', value: 'tender' },
@@ -37,20 +40,28 @@ export class LeadsComponent implements OnInit, OnChanges {
 	];
 
 	leadForm: FormGroup;
+	followUpForm: FormGroup;
 	selectedLead: {
 		name: 'LeadName'
 	};
+
 	clients: any[];
+	followUps: any[] = [];
 
 	constructor(private fb: FormBuilder, private leadService: LeadService, private clientService: ClientService,
-				private quoteService: QuoteService, private jobService: JobService) {
+		private quoteService: QuoteService, private jobService: JobService) {
 		this.leadForm = fb.group({
 			action: [''],
 			type: [''],
 			subtype: [''],
 			name: [''],
 			description: [''],
-			clientId: ['']
+			clientId: [null]
+		});
+		this.followUpForm = fb.group({
+			date: [''],
+			description: [''],
+			staff: ['']
 		});
 	}
 
@@ -74,16 +85,36 @@ export class LeadsComponent implements OnInit, OnChanges {
 				description: this.leadData.leadDescription,
 				type: this.leadData.type
 			});
+			this.leadForm.markAsTouched();
 		}
 	}
 
 	createLead() {
 		// Makes new lead and new quote, new job
-		this.leadService.createLead(this.leadForm.value).then(res => {
-			this.quoteService.createQuote({ leadId: res.insertId });
-			this.jobService.createJob({ leadId: res.insertId });
-			// Adds the new lead to the list of current leads
-			this.eventCreateLead.emit(this.leadForm.value());
+		this.leadService.createLead(Object.assign(this.leadForm.value, { leadStage: 1 })).then(res => {
+			this.quoteService.createQuote({ leadId: res.insertId }).then(res1 => {
+				this.jobService.createJob({ quoteId: res1.insertId, leadId: res.insertId }).then(res2 => {
+					this.eventCreateLead.emit();
+				});
+			});
 		});
+	}
+
+	updateLead() {
+		this.leadService.updateLead(this.leadData.leadId, this.leadForm.value).then(res => {
+			this.eventUpdateLead.emit(Object.assign(this.leadForm.value, { leadId: this.leadData.leadId }));
+		});
+	}
+
+	createFollowUp() {
+		console.log('follow up value', this.followUpForm.value)
+		this.followUpForm.value.staffId = this.followUpForm.value.staff.staffId;
+		delete this.followUpForm.value.staff;
+
+		this.jobService.createFollowUp(this.leadData.leadId, this.followUpForm.value)
+			.then(res => {
+				this.followUps.push(this.followUpForm.value);
+				this.eventCreateFollowUp.emit();
+			});
 	}
 }

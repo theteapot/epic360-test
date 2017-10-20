@@ -36,16 +36,25 @@ export class JobService {
 			});
 	}
 
-	getSiteVisits(jobId: number): Promise<any[]> {
-		return this.datasource.getData(`read/SiteVisitView/jobId/${jobId}`);
+	getSiteVisits(jobId?: number): Promise<any[]> {
+		if (jobId) {
+			return this.datasource.getData(`read/SiteVisitView/jobId/${jobId}`);
+		} else {
+			return this.datasource.getData(`read/SiteVisitView`);
+		}
+		
 	}
 
 	getSiteVisitPictures(siteVisitId: number): Promise<{ data: string, description: string }[]> {
 		return this.datasource.getData(`picture/siteVisitid/${siteVisitId}`);
 	}
 
-	getFollowUps(jobId: number): Promise<any[]> {
-		return this.datasource.getData(`read/FollowUp/jobId/${jobId}`);
+	getFollowUps(jobId?: number): Promise<any[]> {
+		if (jobId) {
+			return this.datasource.getData(`read/FollowUpView/jobId/${jobId}`);
+		} else {
+			return this.datasource.getData(`read/FollowUpView`);
+		}
 	}
 
 	changeStatus(jobId: number, status: string): Promise<any> {
@@ -87,8 +96,8 @@ export class JobService {
 		return this.datasource.postData('create/Job', job);
 	}
 
-	createFollowUp(jobId: number, followUpData: any) {
-		followUpData.jobId = jobId;
+	createFollowUp(leadId: number, followUpData: any) {
+		followUpData.leadId = leadId;
 		return this.datasource.postData('create/FollowUp', followUpData);
 	}
 
