@@ -17,7 +17,8 @@ p {
 .task {
 	border-style: solid;
 	border-width: 1px;
-	min-width: 50%;
+	width: 300px;
+	height: 150px;
 	margin: 5px;
 	border-color: #DDDDDD;	
 }
@@ -47,13 +48,21 @@ p {
 	margin: 0px;
 }
 
-/* Styling the job elements */
-.job {
+/* Default box element */
+.stagingBox {
+	display: inline-block;
+	border-radius: 5px;
 	border-style: solid;
 	border-width: 1px;
 	width: 80%;
-	margin: auto;
+	width: 250px;
+	height: auto;
+	margin: 5px;
 	border-color: #DDDDDD;
+}
+/* Styling the job elements */
+.job {
+
 }
 
 .job .handle {
@@ -62,11 +71,7 @@ p {
 
 /* Styling the staff elements */
 .staff {
-	border-style: solid;
-	border-width: 1px;
-	min-width: 80%;
-	margin: auto;
-	border-color: #DDDDDD;	
+	
 }
 
 .staff .handle {

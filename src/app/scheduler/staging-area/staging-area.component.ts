@@ -159,7 +159,7 @@ export class StagingAreaComponent implements OnInit, AfterViewInit {
 			for (let i = 0; i < draggables.length; i++) {
 				const drag = draggables[i];
 				const event = {
-					title: $(drag).find('.equipment .handle').text(),
+					title: $(drag).find('.handle').text(),
 					equipment: $(drag).find('.equipment .handle').text(),
 					equipmentId: $(drag).find('.equipment').prevObject.attr('equipmentId'),
 					taskId: $(drag).find('.container').attr('taskId'),

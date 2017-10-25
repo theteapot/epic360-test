@@ -2,18 +2,17 @@
 
 	<p-tabPanel header="Jobs">
 		<div class="ui-g-row wrapper">
-			<div *ngFor="let job of jobs" class="draggable job" [id]="job.jobId" [attr.title]="job.title" [attr.type]="'job'">
-				<h4 class="handle"><b>J{{job.jobId}}: {{job.title}}</b></h4>
-				<p>{{job.description}}</p>
-				<p>{{job.status}}</p>
+			<div *ngFor="let job of jobs" class="stagingBox draggable job" [id]="job.jobId" [attr.title]="job.title" [attr.type]="'job'">
+				<h5 class="handle"><b>J{{job.jobId}}: {{job.title}}</b></h5>
+				<p>{{job.description}} : {{job.status}}</p>
 			</div>
 		</div>
 	</p-tabPanel>
 
 	<p-tabPanel header="Staff">
 		<div class="ui-g-row wrapper">
-			<div *ngFor="let s of staff" class="draggable staff" [attr.staffId]="s.staffId" [attr.name]="s.desc" [attr.type]="'staff'" [attr.name]="s.firstName + ' ' + s.lastName">
-				<h4 class="handle"><b>{{s.name}}</b></h4>
+			<div *ngFor="let s of staff" class="stagingBox draggable staff" [attr.staffId]="s.staffId" [attr.name]="s.desc" [attr.type]="'staff'" [attr.name]="s.firstName + ' ' + s.lastName">
+				<h5 class="handle"><b>{{s.name}}</b></h5>
 				<p>{{s.workType}}</p>
 			</div>
 		</div>
@@ -28,8 +27,8 @@
 		<p-selectButton [options]="taskPanelOptions" [(ngModel)]="selectedTaskPanel" (click)="taskPanelChange()"></p-selectButton>
 		<div class="row" *ngIf="selectedTaskPanel==='assign'">
 			<div class="col-6 wrapper">
-				<div *ngFor="let task of filteredTasks" class="task draggable" [attr.type]="'task'">
-					<h4 class="handle"><b>{{task.header}}</b></h4>
+				<div *ngFor="let task of filteredTasks" class="task draggable stagingBox" [attr.type]="'task'">
+					<h5 class="handle"><b>{{task.header}}</b></h5>
 					<p>{{task.description}}</p>
 					<div class='container' [dragula]='"first-bag"' style="min-height: 50px; padding-bottom: 20px;" [attr.taskId]="task.taskId" [attr.jobId]="task.jobId">
 						<div *ngFor="let equip of equipment"> 

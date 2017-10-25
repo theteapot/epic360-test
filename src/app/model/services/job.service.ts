@@ -57,8 +57,8 @@ export class JobService {
 		}
 	}
 
-	changeStatus(jobId: number, status: string): Promise<any> {
-		return this.datasource.putData(`update/Job/jobId/${jobId}`, { status: status })
+	changeStatus(jobId: number, job: object): Promise<any> {
+		return this.datasource.putData(`update/Job/jobId/${jobId}`, job)
 			.then(res => {
 				console.log('status changed');
 			});

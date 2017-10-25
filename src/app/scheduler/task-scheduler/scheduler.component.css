@@ -36,3 +36,7 @@
 .fc-time-area .fc-event-container {
 	padding-bottom: 0 !important;
 }
+
+.ui-chkbox {
+	padding: 5px;
+}

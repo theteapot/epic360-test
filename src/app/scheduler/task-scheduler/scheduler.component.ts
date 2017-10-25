@@ -12,6 +12,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
 
 import * as sha1 from 'sha1';
 import * as fullCalendar from 'fullcalendar';
+import * as moment from 'moment';
 
 declare var $: any;
 
@@ -49,7 +50,6 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 	ngOnInit() {
 
 		const jobPromise = this.jobService.getJobs().then(jobs => {
-
 			this.resources.push({
 				id: 'new',
 				title: 'Add new job',
@@ -104,6 +104,7 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 					resourceId: `${task.jobId}-${task.staffId}`,
 					title: `${task.registration}: ${task.description}`,
 					start: task.start,
+					status: task.status,
 					end: task.end,
 					type: 'task'
 				});
@@ -161,6 +162,10 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 			eventoverlap: false,
 			eventRender: (event, element) => {
 				console.log('event render', event, element);
+				if (event.status === 'active') {
+					element.css('border-color', 'green!important');
+					element.css('color', 'green');
+				}
 				if (event.type === 'job') {
 					element.addClass('job-event');
 					element.css('background-color', '#' + sha1(event.title).slice(0, 6));
@@ -357,13 +362,15 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 
 	handleEventAllow(resource, event) {
 		// Only allow the dropping of events onto the jobs which they belong to
-		console.log('event allow', resource, event);
+		return true;
+		/*console.log('event allow', resource, event, resource.resourceId.split('-')[0], event.resourceId);
 		const jobId = resource.resourceId.split('-')[0];
-		if (event.jobId !== jobId) {
+		const eventJobId = event.resourceId.split('-')[0];
+		if (event.resourceId !== jobId && jobId) {
 			return false;
 		} else {
 			return true;
-		}
+		}*/
 	}
 
 	renderMultipleEvents(parent) {
@@ -390,10 +397,11 @@ export class SchedulerComponent implements OnInit, AfterViewInit, AfterViewCheck
 
 	updateEvent(event) {
 		// Given an event object, update the corresponding DB table with its information
+		console.log('resourceEvent', event, event.type === 'job', moment(event.start).format('YYYY-MM-DD'));
 		if (event.type === 'job') {
 			// We have created a job resource by dragging
 			// This indicates the job has moved from inactive to active
-			this.jobService.changeStatus(event.id, 'active');
+			this.jobService.updateJob(event.id, { status: 'active', start: moment(event.start).format('YYYY-MM-DD') });
 		} else if (event.type === 'staff') {
 		}
 	}

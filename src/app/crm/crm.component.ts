@@ -12,6 +12,7 @@ import { StaffService } from '../model/services/staff.service';
 export class CrmComponent implements OnInit {
 
 	staff: any;
+	schedulerEvents: any // Mix of site visits and follow ups
 
 	quoteData: any;
 	leadData: any;
@@ -70,6 +71,19 @@ export class CrmComponent implements OnInit {
 		});
 	}
 
+	refreshScheduler() {
+		Promise.all([this.jobService.getFollowUps(), this.jobService.getSiteVisits()]).then(values => {
+			this.schedulerEvents = values[0].concat(values[1]).map(event => {
+				return {
+					title: event.title,
+					start: event.date,
+					value: event,
+					color: event.followUpId ? 'red' : 'blue'
+				};
+			});
+		});
+	}
+ 
 	handleQuoteData(data) {
 		this.quoteData = data;
 	}

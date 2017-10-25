@@ -67,6 +67,13 @@ export class StaffService {
 			});
 	}
 
+	unassignStaff(staffId: number, jobId: number) {
+		return this.datasource.deleteData(`job/unassign/${jobId}/${staffId}`)
+			.then( res => {
+				console.log('deleted')
+			})
+	}
+
 	getStaffAssignment(): Promise<any> {
 		// For getting the jobs staff members are assigned to
 		return this.datasource.getData('read/StaffView')

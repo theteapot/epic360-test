@@ -1,5 +1,5 @@
-<div class="ui-g" style="width:250px;margin-bottom:10px" *ngIf="staff">
-	<p-checkbox *ngFor="let s of staff" [value]="s.staffId" [(ngModel)]="selectedStaff" [label]="s.name" (click)=filterStaff()></p-checkbox>
+<div class="ui-g" *ngIf="staff">
+	<p-checkbox  *ngFor="let s of staff" [value]="s.staffId" [(ngModel)]="selectedStaff" [label]="s.name" (click)=filterStaff()></p-checkbox>
 </div>
 
 <div id="staff-scheduler"></div>

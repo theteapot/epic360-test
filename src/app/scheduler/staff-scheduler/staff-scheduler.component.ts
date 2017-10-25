@@ -29,6 +29,7 @@ export class StaffSchedulerComponent implements OnInit {
 	@Input() selectedStaff: any[] = []; // Keeps track of the people who are selected
 	selectedEvent: any; // When we click on an event this is set
 	showEventDialog: boolean = false; // Whether or not we should show the event dialog
+	dragStopEvent: any // Holds the event data of the last dropped event
 
 
 	resources: { id: number, title: string, type: string }[] = [];
@@ -151,6 +152,9 @@ export class StaffSchedulerComponent implements OnInit {
 				console.log(render);
 				if (!render) { return false; }
 			},
+			eventDragStop: (event, jsEvent, ui, view) => {
+				this.handleDragStop(event, jsEvent, ui, view);
+			},
 			eventClick: (event, jsEvent, view) => {
 				this.handleEventClick(event, jsEvent, view);
 			},
@@ -169,6 +173,10 @@ export class StaffSchedulerComponent implements OnInit {
 		console.log('eventDrop', 'jobId', resourceId, 'staffId', $(jsEvent.target).attr('staffId'));
 	}
 
+	handleDragStop(event, jsEvent, ui, view) {
+		this.dragStopEvent = event;
+	}
+
 	schedulerAccept(draggable) {
 		// Only accept staff draggables
 		if ($(draggable).attr('type') === 'staff') {
@@ -185,7 +193,6 @@ export class StaffSchedulerComponent implements OnInit {
 			staffId: event.staffId,
 			jobId: event.resourceId,
 			start: event.start,
-			end: event.end ? event.end : null
 		};
 		this.staffService.createStaffPlaceholder(placeholder)
 			// Update the values
@@ -193,7 +200,7 @@ export class StaffSchedulerComponent implements OnInit {
 				event.staffPlaceholderId = res.insertId;
 				this.staffScheduler.fullCalendar('updateEvent', event);
 			});
-		// this.staffService.assignStaff(placeholder.jobId, placeholder.staffId);
+		this.staffService.assignStaff(placeholder.jobId, placeholder.staffId);
 	}
 
 	handleEventClick(event, jsEvent, view) {
@@ -217,6 +224,12 @@ export class StaffSchedulerComponent implements OnInit {
 	}
 
 	handleEventDrop(event, delta, revertFunc, jsEvent, ui, view) {
+		console.log('handle drop', event, delta, revertFunc, jsEvent, ui, view)
+		if (this.dragStopEvent.resourceId !== event.resourceId) {
+			this.staffService.unassignStaff(event.staffId, this.dragStopEvent.resourceId);
+			this.staffService.assignStaff(event.resourceId, event.staffId);
+		}
+
 		const placeholder = {
 			staffPlaceholderId: event.staffPlaceholderId,
 			staffId: event.staffId,
@@ -245,7 +258,8 @@ export class StaffSchedulerComponent implements OnInit {
 
 	removeEvent(event) {
 		// Removes that staff placeholder element
-		this.staffService.removeStaffPlaceholder(event)
+		Promise.all([this.staffService.removeStaffPlaceholder(event), 
+			this.staffService.unassignStaff(event.staffId, event.resourceId)])
 			.then(res => {
 				console.log('removing event', event._id);
 				this.staffScheduler.fullCalendar('removeEvents', eventObj => {

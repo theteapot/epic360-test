@@ -14,4 +14,5 @@ export interface Task {
 	lastName?: string;
 	registration?: string;
 	workType?: number;
+	status?: string;
 }
