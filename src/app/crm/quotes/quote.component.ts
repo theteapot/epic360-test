@@ -21,8 +21,10 @@ import { MessageService } from 'primeng/components/common/messageservice';
 export class QuoteComponent implements OnInit, OnChanges {
 
 	@Input() quoteData: any;
+	@Input() leadData: any;
 
 	@Output() quoteChange = new EventEmitter();
+	@Output() leadChange = new EventEmitter();
 	@Output() quoteCreated = new EventEmitter();
 	@Output() quoteToJobEvent = new EventEmitter();
 
@@ -92,8 +94,19 @@ export class QuoteComponent implements OnInit, OnChanges {
 
 		// Want to do two things to update flags
 		// Set the flag of the job to 0, and set the flag of the quote to 1
-
-		if (this.quoteData) {
+		console.log(this.leadData);
+		if (this.leadData.leadStage === 1) {
+			console.log('selected lead', this.leadData);
+			console.log('going from lead to quote');
+			this.quoteService.createQuote({ quoteStage: 1, leadId: this.leadData.leadId, description: this.quoteForm.value.description })
+				.then(res => {
+					this.quoteChange.emit();
+				});
+			this.leadService.updateLead(this.leadData.leadId, { leadStage: 0 })
+				.then(res => {
+					this.leadChange.emit(Object.assign(this.leadData, {leadStage: 0}));
+				})
+		} else if (this.quoteData) {
 			this.quoteService.updateQuote(this.quoteData.quoteId, { quoteStage: 1, description: this.quoteForm.value.description })
 				.then(res => {
 					this.quoteChange.emit(Object.assign(this.quoteForm.value, { quoteId: this.quoteData.quoteId, leadId: this.quoteData.leadId }));
@@ -177,14 +190,14 @@ export class QuoteComponent implements OnInit, OnChanges {
 	}
 
 	quoteToJob(quoteRows: any[]) {
-		this.quoteService.updateQuote(this.quoteData.quoteId, {quoteStage: 0}).then( () => {
+		this.quoteService.updateQuote(this.quoteData.quoteId, { quoteStage: 0 }).then(() => {
 			this.quoteChange.emit();
 		});
 		this.jobService.createJob({ quoteId: this.quoteData.quoteId, leadId: this.quoteData.leadId, jobStage: 1 }).then(res => {
 			const jobId = res.insertId;
 			this.quoteToJobEvent.emit();
 			// Create all tasks in the database
-			Promise.all(quoteRows.map(row => this.rowToTask(row, jobId))).then( () => {
+			Promise.all(quoteRows.map(row => this.rowToTask(row, jobId))).then(() => {
 
 			});
 		});

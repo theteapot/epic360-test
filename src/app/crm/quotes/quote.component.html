@@ -23,7 +23,7 @@
 				</div>
 			</form>
 		</div>
-		<button type="button" pButton [disabled]="!quoteForm.valid" (click)="createQuote()" label="Create Quote"></button>
+		<button *ngIf="!quoteData.quoteStage" type="button" pButton [disabled]="!quoteForm.valid" (click)="createQuote()" label="Create Quote"></button>
 		<button *ngIf="quoteData.quoteStage" type="button" pButton [disabled]="!quoteRows" (click)="quoteToJob(quoteRows)" label="Turn Into Job"></button>
 	</div>
 	<div *ngIf="!quoteData">

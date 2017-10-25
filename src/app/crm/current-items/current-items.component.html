@@ -1,5 +1,5 @@
 <p-panel class="ui-g-4" header="Current Leads">
-	<p-listbox *ngIf="currentLeads" [options]="currentLeads" [(ngModel)]="selectedLead">
+	<p-listbox *ngIf="currentLeads" [options]="displayedLeads" [(ngModel)]="selectedLead">
 		<ng-template let-lead pTemplate="item">
 			<div *ngIf="lead.value.leadStage === 1" (click)="selectLead(lead.value)">
 				<b>Lead: {{lead.value.leadName}}</b>
@@ -10,7 +10,7 @@
 	</p-listbox>
 </p-panel>
 <p-panel class="ui-g-4" header="Current Quotes">
-	<p-listbox *ngIf="currentQuotes" [options]="currentQuotes" [(ngModel)]="selectedQuote">
+	<p-listbox *ngIf="currentQuotes" [options]="displayedQuotes" [(ngModel)]="selectedQuote">
 		<ng-template let-quote pTemplate="item">
 			<div *ngIf="quote.value.quoteStage" (click)="selectQuote(quote.value)">
 				<b>QuoteID: {{quote.value.quoteId}}</b>
@@ -20,7 +20,7 @@
 	</p-listbox>
 </p-panel>
 <p-panel class="ui-g-4" header="Current Jobs">
-	<p-listbox *ngIf="currentJobs" [options]="currentJobs" [(ngModel)]="selectedJob">
+	<p-listbox *ngIf="currentJobs" [options]="displayedJobs" [(ngModel)]="selectedJob">
 		<ng-template let-job pTemplate="item">
 			<div *ngIf="job.value.jobStage" (click)="selectJob(job.value)">
 				<b>{{job.value.title}}</b>
@@ -30,5 +30,3 @@
 		</ng-template>
 	</p-listbox>
 </p-panel>
-
-{{currentLeads | json}}

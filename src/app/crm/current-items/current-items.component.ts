@@ -8,11 +8,15 @@ import { QuoteService } from '../../model/services/quote.service';
 	templateUrl: './current-items.component.html',
 	styleUrls: ['./current-items.component.css']
 })
-export class CurrentItemsComponent implements OnInit {
+export class CurrentItemsComponent implements OnInit, OnChanges {
 
 	@Input() currentQuotes: any[];
 	@Input() currentJobs: any[];
 	@Input() currentLeads: any[];
+
+	displayedQuotes: any[];
+	displayedJobs: any[];
+	displayedLeads: any[];
 
 	selectedLead: any;
 	selectedQuote: any;
@@ -29,8 +33,14 @@ export class CurrentItemsComponent implements OnInit {
 		private quoteService: QuoteService
 	) { }
 
-	ngOnInit() {
+	ngOnInit() { }
 
+	ngOnChanges() {
+		if (this.currentJobs && this.currentLeads && this.currentQuotes) {
+			this.displayedJobs = this.currentJobs.filter(job => job.value.jobStage);
+			this.displayedLeads = this.currentLeads.filter(lead => lead.value.leadStage);
+			this.displayedQuotes = this.currentQuotes.filter(quote => quote.value.quoteStage);
+		}
 	}
 
 	selectLead(lead: any) {
@@ -45,6 +55,7 @@ export class CurrentItemsComponent implements OnInit {
 	selectJob(job: any) {
 		this.selectedLead = null;
 		this.selectedQuote = null;
+		console.log(this.currentLeads);
 		this.leadData.emit(this.currentLeads.filter(lead => {
 			if (lead.value.leadId === job.leadId) {
 				return lead.value;
